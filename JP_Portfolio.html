@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description"
+    content="John Paul Ubas — Full-Stack Software Developer specializing in business systems, CRM platforms, AI integrations, automation, and scalable web applications.">
+  <meta name="author" content="John Paul Ubas">
+
+  <title>John Paul Ubas — Full-Stack Software Developer</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & CONSTANTS
+       ========================================================================== */
+    :root {
+      /* Deep space dark theme */
+      --bg-base: #06090e;
+      --bg-surface: #0b1017;
+      --bg-surface-elevated: #111722;
+      --bg-surface-glass: rgba(11, 16, 23, 0.75);
+
+      /* Accent tokens */
+      --cyan: #00e5ff;
+      --cyan-soft: rgba(0, 229, 255, 0.08);
+      --cyan-border: rgba(0, 229, 255, 0.22);
+      --cyan-glow: rgba(0, 229, 255, 0.35);
+
+      /* Text Hierarchy */
+      --text-main: #f8fafc;
+      --text-subtle: #94a3b8;
+      --text-muted: #64748b;
+
+      /* Borders */
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-medium: rgba(255, 255, 255, 0.12);
+
+      /* Fonts */
+      --font-head: "Space Grotesk", sans-serif;
+      --font-body: "Inter", sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
+
+      --max-width: 1180px;
+      --radius-sm: 6px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-base);
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-subtle);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Structured micro-grid background */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 85%);
+    }
+
+    .container {
+      width: min(var(--max-width), calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    /* ==========================================================================
+       NAVIGATION
+       ========================================================================== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--bg-surface-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    nav {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-family: var(--font-head);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--cyan-soft);
+      border: 1px solid var(--cyan-border);
+      border-radius: var(--radius-sm);
+      color: var(--cyan);
+      font-size: 0.85rem;
+    }
+
+    .logo span {
+      color: var(--cyan);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-subtle);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    /* ==========================================================================
+       HERO SECTION
+       ========================================================================== */
+    section {
+      scroll-margin-top: 100px;
+    }
+
+    .hero-section {
+      padding: 160px 0 90px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--cyan-soft);
+      border: 1px solid var(--cyan-border);
+      border-radius: 100px;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .hero-title {
+      font-family: var(--font-head);
+      font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-head);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-subtle);
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-description {
+      max-width: 620px;
+      color: var(--text-subtle);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #030810;
+      border: 1px solid var(--cyan);
+      box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
+    }
+
+    .btn-primary:hover {
+      background: #33eaff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0, 229, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-medium);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cyan-border);
+      color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    /* System HUD Card */
+    .hud-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .hud-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .hud-body {
+      padding: 20px;
+    }
+
+    .hud-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .hud-row:last-child {
+      border-bottom: none;
+    }
+
+    .hud-key {
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+    }
+
+    .hud-val {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .hud-val.accent {
+      color: var(--cyan);
+    }
+
+    /* ==========================================================================
+       METRICS SECTION
+       ========================================================================== */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding-bottom: 40px;
+    }
+
+    .metric-card {
+      padding: 28px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      transition: border-color 0.2s ease;
+    }
+
+    .metric-card:hover {
+      border-color: var(--border-medium);
+    }
+
+    .metric-num {
+      font-family: var(--font-mono);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .metric-num span {
+      color: var(--cyan);
+    }
+
+    .metric-label {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .metric-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       SECTION COMMON STYLES
+       ========================================================================== */
+    .section {
+      padding: 90px 0;
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
+    }
+
+    .section-subtitle {
+      color: var(--text-subtle);
+      font-size: 1rem;
+      margin-top: 8px;
+      max-width: 620px;
+    }
+
+    /* ==========================================================================
+       PROJECTS GRID
+       ========================================================================== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .project-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .project-card:hover {
+      border-color: var(--cyan-border);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+    }
+
+    .project-card.featured {
+      grid-column: 1 / -1;
+      background: linear-gradient(180deg, var(--bg-surface-elevated) 0%, var(--bg-surface) 100%);
+      border-color: var(--cyan-border);
+    }
+
+    .project-media {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(255,255,255,0.02);
+      overflow: hidden;
+    }
+
+    .project-media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.05) contrast(1.03);
+      transition: transform 0.35s ease;
+    }
+
+    .project-card:hover .project-media img {
+      transform: scale(1.04);
+    }
+
+    .project-card-inner {
+      padding: 32px;
+    }
+
+    .project-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .project-category {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .flagship-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 3px 9px;
+      background: var(--cyan-soft);
+      border: 1px solid var(--cyan-border);
+      color: var(--cyan);
+      border-radius: 100px;
+    }
+
+    .project-title {
+      font-family: var(--font-head);
+      font-size: 1.3rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--text-subtle);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .project-impact {
+      font-size: 0.85rem;
+      padding-left: 12px;
+      border-left: 2px solid var(--cyan);
+      color: var(--text-subtle);
+      margin-bottom: 24px;
+    }
+
+    .project-impact strong {
+      color: var(--text-main);
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       EXPERIENCE SECTION
+       ========================================================================== */
+    .experience-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .exp-card {
+      padding: 32px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      transition: border-color 0.2s ease;
+    }
+
+    .exp-card:hover {
+      border-color: var(--border-medium);
+    }
+
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+
+    .exp-role {
+      font-family: var(--font-head);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .exp-company {
+      color: var(--cyan);
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .exp-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 5px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .exp-bullets {
+      list-style: none;
+    }
+
+    .exp-bullets li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 0.925rem;
+      color: var(--text-subtle);
+      margin-bottom: 10px;
+    }
+
+    .exp-bullets li:last-child {
+      margin-bottom: 0;
+    }
+
+    .exp-bullets li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
+    }
+
+    /* ==========================================================================
+       SKILLS MATRIX
+       ========================================================================== */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .skill-card {
+      padding: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    .skill-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-head);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+
+    .skill-title i {
+      color: var(--cyan);
+      font-size: 0.9rem;
+    }
+
+    /* ==========================================================================
+       CONTACT BOX
+       ========================================================================== */
+    .contact-card {
+      padding: 80px 40px;
+      text-align: center;
+      background: linear-gradient(180deg, var(--bg-surface-elevated) 0%, var(--bg-surface) 100%);
+      border: 1px solid var(--cyan-border);
+      border-radius: var(--radius-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
+    }
+
+    .contact-subtitle {
+      color: var(--text-subtle);
+      max-width: 540px;
+      margin: 0 auto 36px;
+      font-size: 1.05rem;
+    }
+
+    .contact-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       FOOTER
+       ========================================================================== */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE DESIGN
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-card.featured {
+        grid-column: auto;
+      }
+
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .exp-header {
+        flex-direction: column;
+      }
+
+      .section {
+        padding: 65px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-grid"></div>
+
+  <!-- NAVIGATION -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="#" class="logo">
+          <span class="logo-badge"><i class="fa-solid fa-code"></i></span>
+          JPU<span>.dev</span>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#stack">Stack</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section id="about" class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="status-badge">
+              <span class="status-dot"></span>
+              AVAILABLE FOR OPPORTUNITIES
+            </div>
+
+            <h1 class="hero-title">
+              John Paul <span>Ubas.</span>
+            </h1>
+
+            <div class="hero-subtitle">
+              Full-Stack Software Developer
+            </div>
+
+            <p class="hero-description">
+              I build business-critical software systems, CRM platforms, internal management tools, automation
+              workflows, and AI-powered applications. My work focuses on turning complex business processes into
+              reliable, scalable software.
+            </p>
+
+            <div class="hero-actions">
+              <a href="mailto:jpubas@gmail.com" class="btn btn-primary">
+                <i class="fa-solid fa-paper-plane"></i>
+                Let's Work Together
+              </a>
+              <a href="https://linkedin.com/in/john-paul-ubas-9a6b07204/" target="_blank" rel="noopener"
+                class="btn btn-secondary">
+                <i class="fa-brands fa-linkedin"></i>
+                LinkedIn
+              </a>
+            </div>
+          </div>
+
+          <!-- SYSTEM HUD PANEL -->
+          <div class="hud-panel">
+            <div class="hud-header">
+              <span><i class="fa-solid fa-terminal"></i> DEVELOPER_PROFILE</span>
+              <span style="color: var(--cyan)">● ONLINE</span>
+            </div>
+
+            <div class="hud-body">
+              <div class="hud-row">
+                <span class="hud-key">Primary Focus</span>
+                <span class="hud-val accent">Full-Stack Systems</span>
+              </div>
+              <div class="hud-row">
+                <span class="hud-key">Backend Core</span>
+                <span class="hud-val">Laravel / Node.js</span>
+              </div>
+              <div class="hud-row">
+                <span class="hud-key">Frontend Frameworks</span>
+                <span class="hud-val">Vue / Next.js</span>
+              </div>
+              <div class="hud-row">
+                <span class="hud-key">Database Systems</span>
+                <span class="hud-val">MySQL / PostgreSQL</span>
+              </div>
+              <div class="hud-row">
+                <span class="hud-key">Specialization</span>
+                <span class="hud-val accent">SaaS / CRM / AI Integration</span>
+              </div>
+              <div class="hud-row">
+                <span class="hud-key">Location</span>
+                <span class="hud-val">Philippines</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- METRICS SECTION -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-num">9<span>+</span></div>
+            <div class="metric-label">Business Systems</div>
+            <div class="metric-desc">Built across CRM, e-commerce, HR, recruitment, POS, education, events, and
+              emergency response.</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-num">3<span>+</span></div>
+            <div class="metric-label">Years in Software & IT</div>
+            <div class="metric-desc">Experience across software engineering, business analysis, IT operations, and
+              enterprise systems.</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-num">AI<span>+</span></div>
+            <div class="metric-label">AI & Automation</div>
+            <div class="metric-desc">Experience integrating AI into business workflows and SaaS platforms.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS SECTION -->
+    <section id="projects" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">// SELECTED WORK</div>
+          <h2 class="section-title">Systems I've Built</h2>
+          <p class="section-subtitle">A selection of business applications, internal platforms, enterprise systems, and
+            software products developed across different industries.</p>
+        </div>
+
+        <div class="projects-grid">
+          <!-- TIKRR -->
+          <article class="project-card featured">
+            <div class="project-media">
+              <img src="images/tikrr.png" alt="TIKRR AI Operating System screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">01 / AI + SaaS</span>
+                <span class="flagship-badge">FLAGSHIP</span>
+              </div>
+              <h3 class="project-title">TIKRR — AI Operating System for Painting Contractors</h3>
+              <p class="project-desc">AI-powered operating system for painting contractors, with a focus on SalesLab,
+                its CRM for managing leads, deals, customers, and sales workflows.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Streamlined CRM and sales processes while improving lead and deal management
+                across the platform.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">Laravel</span>
+                <span class="tag">PHP</span>
+                <span class="tag">MySQL</span>
+                <span class="tag">REST APIs</span>
+                <span class="tag">AI Integration</span>
+                <span class="tag">SaaS</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- POS -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/pos-inventory.png" alt="Hardware Store POS and Inventory System screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">02 / Retail</span>
+              </div>
+              <h3 class="project-title">Hardware Store POS & Inventory System</h3>
+              <p class="project-desc">POS and inventory management system for handling sales, products, stock levels,
+                and retail operations.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Streamlined sales transactions and improved inventory and stock tracking.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">C#</span>
+                <span class="tag">.NET</span>
+                <span class="tag">POS System</span>
+                <span class="tag">Inventory Control</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- RAFFLE -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/raffle-system.png" alt="Raffle Event Management System screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">03 / Enterprise</span>
+              </div>
+              <h3 class="project-title">Raffle Event Management System — Oil & Energy Company</h3>
+              <p class="project-desc">Laravel and MySQL-based system for managing company events, raffles, customers,
+                and participants.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Simplified event and raffle administration while improving participant and
+                customer tracking.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">Laravel</span>
+                <span class="tag">MySQL</span>
+                <span class="tag">Event Management</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- ORANGESHIRE -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/orangeshire.png" alt="OrangeShire Workspace Management Platform screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">04 / Workspace</span>
+              </div>
+              <h3 class="project-title">OrangeShire — Workspace Management Platform</h3>
+              <p class="project-desc">Laravel-based workspace management platform for hot desks, fixed workspaces, room
+                reservations, and administrative operations.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Centralized workspace reservations and streamlined booking management.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">Laravel</span>
+                <span class="tag">Bootstrap</span>
+                <span class="tag">MySQL</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- BUY ANIHAN -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/buy-anihan.png" alt="Buy-Anihan e-commerce platform screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">05 / E-Commerce</span>
+              </div>
+              <h3 class="project-title">Buy-Anihan — Online E-commerce Platform</h3>
+              <p class="project-desc">E-commerce platform connecting farmers and buyers for buying and selling crops and
+                agricultural products online.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Digitized agricultural product transactions and provided farmers with a
+                centralized marketplace to reach potential buyers.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">E-Commerce</span>
+                <span class="tag">Web Platform</span>
+                <span class="tag">Mobile Integration</span>
+                <span class="tag">Database Design</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- JOBPORTAL -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/jobportal.png" alt="JobPortal recruitment platform screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">06 / Recruitment</span>
+              </div>
+              <h3 class="project-title">JobPortal — Recruitment & Job Matching Platform</h3>
+              <p class="project-desc">Laravel-based recruitment platform connecting jobseekers and agencies through job
+                listings, applications, accounts, and skill assessments.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Centralized recruitment workflows and improved candidate and agency management.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">Laravel</span>
+                <span class="tag">PHP</span>
+                <span class="tag">Recruitment Engine</span>
+                <span class="tag">Assessments</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- SGMIS -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/sgmis.png" alt="SGMIS Student Government Information System screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">07 / Education</span>
+              </div>
+              <h3 class="project-title">SGMIS — Student Government Management Information System</h3>
+              <p class="project-desc">Management system for CHMSU Student Government covering records, activities,
+                meetings, events, and organizational workflows.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Centralized student government operations and improved tracking of
+                organizational activities.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">Management System</span>
+                <span class="tag">Record Tracking</span>
+                <span class="tag">Event Archiving</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- MAILER -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/internal-mailer.png" alt="Internal Mailer and Lead Management Platform screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">08 / Marketing Tech</span>
+              </div>
+              <h3 class="project-title">Internal Mailer & Lead Management Platform</h3>
+              <p class="project-desc">Internal platform for sending individual and mass emails, managing leads, and
+                tracking campaign analytics.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Streamlined email campaigns and centralized lead management with performance
+                insights.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">PHP</span>
+                <span class="tag">Gmail API</span>
+                <span class="tag">OAuth 2.0</span>
+                <span class="tag">Analytics</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- MOBILE INCIDENT -->
+          <article class="project-card">
+            <div class="project-media">
+              <img src="images/incident-alert.png" alt="Mobile Incident Alert App screenshot" loading="lazy">
+            </div>
+            <div class="project-card-inner">
+              <div class="project-top">
+                <span class="project-category">09 / Emergency Response</span>
+              </div>
+              <h3 class="project-title">Mobile Incident Alert App</h3>
+              <p class="project-desc">Emergency response software developed for La Salle campus operations. Students can
+                send an emergency alert with a reason and their location is automatically pinned on the campus map.</p>
+              <div class="project-impact">
+                <strong>Impact:</strong> Enabled administrators to identify emergency locations and deploy responders
+                directly to students in need.
+              </div>
+              <div class="tag-cloud">
+                <span class="tag">Mobile App</span>
+                <span class="tag">Geolocation APIs</span>
+                <span class="tag">Emergency Systems</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE SECTION -->
+    <section id="experience" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">// CAREER PATH</div>
+          <h2 class="section-title">Professional Experience</h2>
+          <p class="section-subtitle">Experience spanning software engineering, business analysis, IT operations, and
+            enterprise software development.</p>
+        </div>
+
+        <div class="experience-stack">
+          <!-- TIKRR -->
+          <article class="exp-card">
+            <div class="exp-header">
+              <div>
+                <h3 class="exp-role">Software Developer</h3>
+                <div class="exp-company">Gables & Grove Painting | TIKRR</div>
+              </div>
+              <span class="exp-date">12/2025 — PRESENT</span>
+            </div>
+            <ul class="exp-bullets">
+              <li>Architected and maintained SalesLab, TIKRR's CRM platform using PHP Laravel and MySQL.</li>
+              <li>Developed lead management, deal pipelines, contacts, tasks, and sales activity workflows.</li>
+              <li>Developed and enhanced TAZ AI and AI-powered workflow automation.</li>
+              <li>Designed REST APIs, backend services, database structures, and application workflows.</li>
+              <li>Collaborated within an Agile Scrum development environment.</li>
+            </ul>
+          </article>
+
+          <!-- CM & SONS -->
+          <article class="exp-card">
+            <div class="exp-header">
+              <div>
+                <h3 class="exp-role">IT Staff</h3>
+                <div class="exp-company">CM & Sons Food Products, Inc.</div>
+              </div>
+              <span class="exp-date">05/2025 — 02/2026</span>
+            </div>
+            <ul class="exp-bullets">
+              <li>Administered SAP systems supporting daily order processing and reporting.</li>
+              <li>Performed hardware, network, and software troubleshooting.</li>
+              <li>Supported system reliability and operational continuity.</li>
+            </ul>
+          </article>
+
+          <!-- CORE SUPPORT HUB -->
+          <article class="exp-card">
+            <div class="exp-header">
+              <div>
+                <h3 class="exp-role">Software Engineer & Business Analyst</h3>
+                <div class="exp-company">Core Support Hub</div>
+              </div>
+              <span class="exp-date">06/2024 — 05/2025</span>
+            </div>
+            <ul class="exp-bullets">
+              <li>Developed backend APIs using PHP Laravel and reactive Vue.js interfaces.</li>
+              <li>Built and maintained internal business management systems.</li>
+              <li>Worked on employee management and QR-based attendance workflows.</li>
+              <li>Translated business requirements into technical documentation and workflows.</li>
+              <li>Managed development tasks, version control, and sprint activities.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECHNICAL STACK -->
+    <section id="stack" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">// TECHNICAL ARCHITECTURE</div>
+          <h2 class="section-title">Tools & Technologies</h2>
+          <p class="section-subtitle">Technologies I use to design, develop, integrate, and maintain production
+            software.</p>
+        </div>
+
+        <div class="skills-grid">
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-code"></i>
+              Languages
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">PHP</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">TypeScript</span>
+              <span class="tag">C#</span>
+              <span class="tag">HTML5</span>
+              <span class="tag">CSS3</span>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-layer-group"></i>
+              Frameworks
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">Laravel</span>
+              <span class="tag">Vue.js</span>
+              <span class="tag">Next.js</span>
+              <span class="tag">Node.js</span>
+              <span class="tag">ASP.NET</span>
+              <span class="tag">Bootstrap</span>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-database"></i>
+              Data & APIs
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">MySQL</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">pgAdmin</span>
+              <span class="tag">REST APIs</span>
+              <span class="tag">Google APIs</span>
+              <span class="tag">OAuth</span>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-robot"></i>
+              AI & Automation
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">AI Integration</span>
+              <span class="tag">TAZ AI</span>
+              <span class="tag">Workflow Automation</span>
+              <span class="tag">AI Workflows</span>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-code-branch"></i>
+              Development
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">Git</span>
+              <span class="tag">GitHub</span>
+              <span class="tag">REST</span>
+              <span class="tag">Agile</span>
+              <span class="tag">Scrum</span>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-sitemap"></i>
+              Architecture
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">System Design</span>
+              <span class="tag">Database Design</span>
+              <span class="tag">API Architecture</span>
+              <span class="tag">Business Workflows</span>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-vial"></i>
+              Quality
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">Testing</span>
+              <span class="tag">Debugging</span>
+              <span class="tag">QA</span>
+              <span class="tag">Troubleshooting</span>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-title">
+              <i class="fa-solid fa-list-check"></i>
+              Product
+            </div>
+            <div class="tag-cloud">
+              <span class="tag">Requirements</span>
+              <span class="tag">Documentation</span>
+              <span class="tag">Process Design</span>
+              <span class="tag">Business Analysis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="section">
+      <div class="container">
+        <div class="contact-card">
+          <div class="section-tag" style="text-align: center; margin-bottom: 12px;">// GET IN TOUCH</div>
+          <h2 class="contact-title">Let's build something useful.</h2>
+          <p class="contact-subtitle">Open to software development opportunities, full-stack roles, contract projects,
+            and teams building meaningful products.</p>
+
+          <div class="contact-buttons">
+            <a href="mailto:jpubas@gmail.com" class="btn btn-primary">
+              <i class="fa-regular fa-envelope"></i>
+              jpubas@gmail.com
+            </a>
+            <a href="https://linkedin.com/in/john-paul-ubas-9a6b07204/" target="_blank" rel="noopener"
+              class="btn btn-secondary">
+              <i class="fa-brands fa-linkedin"></i>
+              LinkedIn Profile
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 John Paul Ubas · Full-Stack Software Developer · Built with HTML & CSS
+    </div>
+  </footer>
+
+</body>
+
+</html>
