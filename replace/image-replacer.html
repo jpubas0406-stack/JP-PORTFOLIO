@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Replacer</title>
+    <style>
+      :root {
+        --bg: #f3f6fb;
+        --panel: #ffffff;
+        --panel-alt: #f9fbff;
+        --border: #dde5f0;
+        --text: #1e293b;
+        --muted: #5b6b82;
+        --primary: #2563eb;
+        --primary-strong: #1d4ed8;
+        --secondary: #e2e8f0;
+        --success: #0f766e;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      .app {
+        max-width: 1380px;
+        margin: 0 auto;
+        padding: 28px 18px 60px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.7rem, 2vw, 2.6rem);
+      }
+
+      .badge {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--primary);
+        border: 1px solid rgba(37, 99, 235, 0.18);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        margin: 0 0 12px;
+        font-size: 1.1rem;
+      }
+
+      .dropzone {
+        border: 2px dashed #bfd3ff;
+        background: linear-gradient(180deg, #f6fafd 0%, #eef5ff 100%);
+        border-radius: 18px;
+        min-height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: var(--muted);
+        padding: 16px;
+        cursor: pointer;
+        transition: 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .dropzone:hover,
+      .dropzone.dragover {
+        border-color: var(--primary);
+        background: #edf4ff;
+      }
+
+      .dropzone-label {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+        pointer-events: none;
+      }
+
+      .dropzone-icon {
+        font-size: 2.1rem;
+      }
+
+      .dropzone strong {
+        color: var(--text);
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      button,
+      .button {
+        border: none;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+        font-size: 0.96rem;
+      }
+
+      button:hover,
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .primary-btn {
+        background: linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%);
+        color: white;
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+      }
+
+      .secondary-btn {
+        background: var(--secondary);
+        color: var(--text);
+      }
+
+      .ghost-btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      .small-btn {
+        padding: 7px 12px;
+        font-size: 0.82rem;
+      }
+
+      .editor-wrap {
+        margin-top: 12px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        background: #f8fafc;
+      }
+
+      canvas {
+        display: block;
+        max-width: 100%;
+        margin: 0 auto;
+        background: transparent;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .controls-panel {
+        margin-bottom: 20px;
+      }
+
+      .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+      }
+
+      .control-group {
+        background: var(--panel-alt);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px 16px;
+      }
+
+      .control-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .control-header label,
+      .value-badge {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .value-badge {
+        background: rgba(37, 99, 235, 0.09);
+        border-radius: 999px;
+        padding: 4px 8px;
+        color: var(--primary);
+        font-size: 0.76rem;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--primary);
+      }
+
+      .inline-input {
+        width: 82px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: white;
+        padding: 8px 10px;
+        font-size: 0.96rem;
+        color: var(--text);
+      }
+
+      .segmented {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .segmented button {
+        background: white;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 8px 10px;
+      }
+
+      .segmented button.active {
+        background: rgba(37, 99, 235, 0.1);
+        border-color: rgba(37, 99, 235, 0.25);
+        color: var(--primary);
+      }
+
+      .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #f8fafc;
+        color: var(--muted);
+        margin-top: 16px;
+      }
+
+      .status-box.warning {
+        background: rgba(217, 119, 6, 0.08);
+        border-color: rgba(217, 119, 6, 0.18);
+        color: #9a5b00;
+      }
+
+      .status-box.error {
+        background: rgba(220, 38, 38, 0.08);
+        border-color: rgba(220, 38, 38, 0.16);
+        color: #9f1b1b;
+      }
+
+      .status-box.success {
+        background: rgba(15, 118, 110, 0.08);
+        border-color: rgba(15, 118, 110, 0.15);
+        color: var(--success);
+      }
+
+      .status-box p {
+        margin: 0;
+        font-weight: 600;
+      }
+
+      .final-layout {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .final-result {
+        min-height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8fbff 0%, #eef3ff 100%);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .final-result canvas {
+        max-height: 72vh;
+      }
+
+      .compare-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .compare-card {
+        background: var(--panel-alt);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 12px;
+      }
+
+      .compare-card h3 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+      }
+
+      .compare-card canvas {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #f8fafc;
+        width: 100%;
+      }
+
+      .helper-list {
+        margin: 12px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+
+      .helper-list li + li {
+        margin-top: 6px;
+      }
+
+      @media (max-width: 860px) {
+        .two-column,
+        .compare-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <h1>Image Replacer</h1>
+        <div class="badge">Local browser tool</div>
+      </header>
+
+      <div class="panel" style="margin-bottom: 20px;">
+        <h2 style="margin: 0 0 12px;">How it works</h2>
+        <ol class="helper-list">
+          <li>Upload the image containing the upper area you want to reuse.</li>
+          <li>Select the upper source crop.</li>
+          <li>Upload the image you want to modify.</li>
+          <li>Choose how much of the top of the target should be replaced.</li>
+          <li>Generate the merged result and download it.</li>
+        </ol>
+      </div>
+
+      <main class="two-column">
+        <section class="panel">
+          <h2 class="section-title">1. Upload Source Image</h2>
+          <div id="sourceDropzone" class="dropzone" tabindex="0" role="button" aria-label="Source image dropzone">
+            <div class="dropzone-label">
+              <div class="dropzone-icon">⬆️</div>
+              <div><strong>Drag &amp; Drop Source Image</strong><br />or click here</div>
+            </div>
+          </div>
+          <input id="sourceInput" type="file" accept="image/*" class="hidden" />
+          <div class="button-row">
+            <label for="sourceInput" class="button primary-btn">Choose Source Image</label>
+          </div>
+          <div id="sourceEditorWrap" class="editor-wrap hidden">
+            <canvas id="sourceEditorCanvas" width="800" height="500"></canvas>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2 class="section-title">2. Upload Target Image</h2>
+          <div id="targetDropzone" class="dropzone" tabindex="0" role="button" aria-label="Target image dropzone">
+            <div class="dropzone-label">
+              <div class="dropzone-icon">⬆️</div>
+              <div><strong>Drag &amp; Drop Target Image</strong><br />or click here</div>
+            </div>
+          </div>
+          <input id="targetInput" type="file" accept="image/*" class="hidden" />
+          <div class="button-row">
+            <label for="targetInput" class="button primary-btn">Choose Target Image</label>
+          </div>
+          <div id="targetEditorWrap" class="editor-wrap hidden">
+            <canvas id="targetEditorCanvas" width="800" height="500"></canvas>
+          </div>
+        </section>
+      </main>
+
+      <section class="panel controls-panel">
+        <div class="button-row" style="margin-top:0;">
+          <button id="generateBtn" class="primary-btn">Generate Preview</button>
+          <button id="resetBtn" class="secondary-btn">Reset</button>
+          <button id="saveSettingsBtn" class="ghost-btn">Save Settings</button>
+          <button id="loadSettingsBtn" class="ghost-btn">Load Settings</button>
+          <button id="clearSettingsBtn" class="ghost-btn">Clear Saved</button>
+          <button id="downloadPngBtn" class="ghost-btn">Download PNG</button>
+          <button id="downloadJpgBtn" class="ghost-btn">Download JPG</button>
+        </div>
+
+        <div class="controls-grid" style="margin-top: 18px;">
+          <div class="control-group">
+            <div class="control-header">
+              <label for="replacementRange">Replacement Height</label>
+              <span id="replacementValue" class="value-badge">30%</span>
+            </div>
+            <input id="replacementRange" type="range" min="5" max="80" step="1" value="30" />
+            <div style="display:flex; justify-content:center; margin-top:10px; gap:8px; align-items:center;">
+              <input id="replacementInput" type="number" min="5" max="80" value="30" class="inline-input" />
+              <span>%</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-header">
+              <label>Fit Mode</label>
+            </div>
+            <div id="fitModeButtons" class="segmented">
+              <button type="button" class="active" data-fit="cover">Cover</button>
+              <button type="button" data-fit="contain">Contain</button>
+              <button type="button" data-fit="stretch">Stretch</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-header">
+              <label>Alignment</label>
+            </div>
+            <div id="alignmentButtons" class="segmented">
+              <button type="button" class="active" data-align="center">Center</button>
+              <button type="button" data-align="left">Left</button>
+              <button type="button" data-align="right">Right</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-header">
+              <label for="blendRange">Blend Edge</label>
+              <span id="blendValue" class="value-badge">0 px</span>
+            </div>
+            <input id="blendRange" type="range" min="0" max="50" step="1" value="0" />
+            <div style="display:flex; justify-content:center; margin-top:10px; gap:8px; align-items:center;">
+              <input id="blendInput" type="number" min="0" max="50" value="0" class="inline-input" />
+              <span>px</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-header">
+              <label for="jpgQualityRange">JPG Quality</label>
+              <span id="jpgQualityValue" class="value-badge">90%</span>
+            </div>
+            <input id="jpgQualityRange" type="range" min="10" max="100" step="1" value="90" />
+            <div style="display:flex; justify-content:center; margin-top:10px; gap:8px; align-items:center;">
+              <input id="jpgQualityInput" type="number" min="10" max="100" value="90" class="inline-input" />
+              <span>%</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="statusBox" class="status-box" aria-live="polite">
+          <p>Ready to load images.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="section-title">3. Final Image</h2>
+        <div class="final-layout">
+          <div class="final-result">
+            <canvas id="finalPreviewCanvas" width="1200" height="700" class="hidden"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top: 20px;">
+        <h2 class="section-title">Before / After Preview</h2>
+        <div class="compare-grid">
+          <div class="compare-card">
+            <h3>Original Image 2</h3>
+            <canvas id="beforeCompareCanvas" width="1200" height="700"></canvas>
+          </div>
+          <div class="compare-card">
+            <h3>Final Result</h3>
+            <canvas id="afterCompareCanvas" width="1200" height="700"></canvas>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const STORAGE_KEY = 'imageReplacerSettings';
+
+      const state = {
+        sourceImage: null,
+        targetImage: null,
+        sourceCrop: null,
+        replacementPercent: 30,
+        fitMode: 'cover',
+        alignment: 'center',
+        blend: 0,
+        jpgQuality: 0.9,
+        previewCanvas: null,
+        dragging: false,
+        dragType: null,
+        dragStart: null,
+        activeCrop: null,
+      };
+
+      const sourceInput = document.getElementById('sourceInput');
+      const targetInput = document.getElementById('targetInput');
+      const sourceCanvas = document.getElementById('sourceEditorCanvas');
+      const targetCanvas = document.getElementById('targetEditorCanvas');
+      const sourceEditorWrap = document.getElementById('sourceEditorWrap');
+      const targetEditorWrap = document.getElementById('targetEditorWrap');
+      const finalCanvas = document.getElementById('finalPreviewCanvas');
+      const beforeCompareCanvas = document.getElementById('beforeCompareCanvas');
+      const afterCompareCanvas = document.getElementById('afterCompareCanvas');
+      const statusBox = document.getElementById('statusBox');
+      const replacementRange = document.getElementById('replacementRange');
+      const replacementInput = document.getElementById('replacementInput');
+      const replacementValue = document.getElementById('replacementValue');
+      const blendRange = document.getElementById('blendRange');
+      const blendInput = document.getElementById('blendInput');
+      const blendValue = document.getElementById('blendValue');
+      const jpgQualityRange = document.getElementById('jpgQualityRange');
+      const jpgQualityInput = document.getElementById('jpgQualityInput');
+      const jpgQualityValue = document.getElementById('jpgQualityValue');
+
+      function setStatus(message, type = 'info') {
+        statusBox.className = 'status-box';
+        if (type === 'success') statusBox.classList.add('success');
+        if (type === 'warning') statusBox.classList.add('warning');
+        if (type === 'error') statusBox.classList.add('error');
+        statusBox.innerHTML = '<p>' + message + '</p>';
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function isValidImageFile(file) {
+        if (!file) return false;
+        return file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(file.name);
+      }
+
+      function readFileAsImage(file) {
+        return new Promise((resolve, reject) => {
+          if (!isValidImageFile(file)) {
+            reject(new Error('Unsupported or invalid image file. Please use PNG, JPG, JPEG, or WEBP.'));
+            return;
+          }
+
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('This image could not be decoded. Please try another file.'));
+          };
+          img.src = url;
+        });
+      }
+
+      function createDefaultSourceCrop(img) {
+        const cropHeight = Math.max(60, Math.round(img.naturalHeight * 0.25));
+        return {
+          x: 0,
+          y: 0,
+          width: img.naturalWidth,
+          height: cropHeight,
+        };
+      }
+
+      function getCanvasPoint(event, canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+        return { x, y };
+      }
+
+      function renderSourceEditor() {
+        if (!state.sourceImage) {
+          sourceEditorWrap.classList.add('hidden');
+          return;
+        }
+
+        sourceEditorWrap.classList.remove('hidden');
+        const ctx = sourceCanvas.getContext('2d');
+        const img = state.sourceImage;
+        sourceCanvas.width = img.naturalWidth;
+        sourceCanvas.height = img.naturalHeight;
+        ctx.clearRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+        ctx.drawImage(img, 0, 0, sourceCanvas.width, sourceCanvas.height);
+
+        const crop = state.sourceCrop;
+        const overlay = ctx.createLinearGradient(0, 0, 0, sourceCanvas.height);
+        overlay.addColorStop(0, 'rgba(0,0,0,0.15)');
+        overlay.addColorStop(1, 'rgba(0,0,0,0.45)');
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.34)';
+        ctx.fillRect(0, 0, sourceCanvas.width, crop.y);
+        ctx.fillRect(0, crop.y, crop.x, crop.height);
+        ctx.fillRect(crop.x + crop.width, crop.y, sourceCanvas.width - (crop.x + crop.width), crop.height);
+        ctx.fillRect(0, crop.y + crop.height, sourceCanvas.width, sourceCanvas.height - (crop.y + crop.height));
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(crop.x, crop.y, crop.width, crop.height);
+        ctx.clip();
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.fillRect(crop.x, crop.y, crop.width, crop.height);
+        ctx.restore();
+
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(crop.x, crop.y, crop.width, crop.height);
+
+        ctx.strokeStyle = '#60a5fa';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(crop.x, crop.y);
+        ctx.lineTo(crop.x + crop.width, crop.y);
+        ctx.moveTo(crop.x, crop.y + crop.height);
+        ctx.lineTo(crop.x + crop.width, crop.y + crop.height);
+        ctx.stroke();
+
+        const handleSize = Math.max(14, Math.min(18, sourceCanvas.width * 0.012));
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(crop.x - handleSize / 2, crop.y - 6, handleSize, 12);
+        ctx.fillRect(crop.x + crop.width - handleSize / 2, crop.y - 6, handleSize, 12);
+        ctx.fillRect(crop.x - handleSize / 2, crop.y + crop.height - 6, handleSize, 12);
+        ctx.fillRect(crop.x + crop.width - handleSize / 2, crop.y + crop.height - 6, handleSize, 12);
+
+        ctx.fillStyle = '#2563eb';
+        ctx.fillRect(crop.x - 1, crop.y - 1, 2, 2);
+        ctx.fillRect(crop.x + crop.width - 1, crop.y - 1, 2, 2);
+      }
+
+      function renderTargetEditor() {
+        if (!state.targetImage) {
+          targetEditorWrap.classList.add('hidden');
+          return;
+        }
+
+        targetEditorWrap.classList.remove('hidden');
+        const ctx = targetCanvas.getContext('2d');
+        const img = state.targetImage;
+        targetCanvas.width = img.naturalWidth;
+        targetCanvas.height = img.naturalHeight;
+        ctx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+        ctx.drawImage(img, 0, 0, targetCanvas.width, targetCanvas.height);
+
+        const replacementHeight = Math.max(5, (targetCanvas.height * state.replacementPercent) / 100);
+        ctx.fillStyle = 'rgba(37, 99, 235, 0.16)';
+        ctx.fillRect(0, 0, targetCanvas.width, replacementHeight);
+
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(0, replacementHeight);
+        ctx.lineTo(targetCanvas.width, replacementHeight);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, replacementHeight - 2, targetCanvas.width, 4);
+
+        ctx.font = 'bold 28px Segoe UI';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+        ctx.fillText('Replacement area', 18, replacementHeight - 18);
+      }
+
+      function updateReplacementControls() {
+        const pct = clamp(Number(replacementRange.value), 5, 80);
+        state.replacementPercent = pct;
+        replacementRange.value = pct;
+        replacementInput.value = pct;
+        replacementValue.textContent = pct + '%';
+        renderTargetEditor();
+        if (state.targetImage && state.sourceImage) {
+          renderComparison();
+        }
+      }
+
+      function updateBlendControls() {
+        const px = clamp(Number(blendRange.value), 0, 50);
+        state.blend = px;
+        blendRange.value = px;
+        blendInput.value = px;
+        blendValue.textContent = px + ' px';
+        if (state.targetImage && state.sourceImage) {
+          renderComparison();
+        }
+      }
+
+      function saveSettingsToLocalStorage(silent = false) {
+        try {
+          const settings = {
+            replacementPercent: state.replacementPercent,
+            fitMode: state.fitMode,
+            alignment: state.alignment,
+            blend: state.blend,
+            jpgQuality: state.jpgQuality,
+            sourceCrop: state.sourceCrop,
+          };
+
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+
+          if (!silent) {
+            setStatus('Settings saved in browser storage.', 'success');
+          }
+        } catch (error) {
+          console.error('Failed to save settings:', error);
+          setStatus('Could not save settings in this browser.', 'error');
+        }
+      }
+
+      function loadSettingsFromLocalStorage() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            return false;
+          }
+
+          const settings = JSON.parse(raw);
+          if (!settings) {
+            return false;
+          }
+
+          state.replacementPercent = clamp(Number(settings.replacementPercent ?? 30), 5, 80);
+          state.fitMode = ['cover', 'contain', 'stretch'].includes(settings.fitMode) ? settings.fitMode : 'cover';
+          state.alignment = ['left', 'center', 'right'].includes(settings.alignment) ? settings.alignment : 'center';
+          state.blend = clamp(Number(settings.blend ?? 0), 0, 50);
+          state.jpgQuality = clamp(Number(settings.jpgQuality ?? 0.9), 0.1, 1);
+
+          if (settings.sourceCrop && typeof settings.sourceCrop === 'object') {
+            state.sourceCrop = {
+              x: Number(settings.sourceCrop.x ?? 0),
+              y: Number(settings.sourceCrop.y ?? 0),
+              width: Number(settings.sourceCrop.width ?? 0),
+              height: Number(settings.sourceCrop.height ?? 0),
+            };
+          }
+
+          replacementRange.value = state.replacementPercent;
+          replacementInput.value = state.replacementPercent;
+          replacementValue.textContent = state.replacementPercent + '%';
+
+          blendRange.value = state.blend;
+          blendInput.value = state.blend;
+          blendValue.textContent = state.blend + ' px';
+
+          jpgQualityRange.value = Math.round(state.jpgQuality * 100);
+          jpgQualityInput.value = Math.round(state.jpgQuality * 100);
+          jpgQualityValue.textContent = Math.round(state.jpgQuality * 100) + '%';
+
+          updateFitButtons();
+          updateAlignmentButtons();
+
+          if (state.sourceImage) {
+            renderSourceEditor();
+          }
+
+          if (state.targetImage) {
+            renderTargetEditor();
+          }
+
+          if (state.sourceImage && state.targetImage) {
+            renderFinalPreview();
+            renderComparison();
+          }
+
+          setStatus('Saved settings restored.', 'success');
+          return true;
+        } catch (error) {
+          console.error('Failed to load settings:', error);
+          setStatus('Saved settings could not be restored.', 'error');
+          return false;
+        }
+      }
+
+      function clearSavedSettings() {
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+          setStatus('Saved settings cleared from browser storage.', 'success');
+        } catch (error) {
+          console.error('Failed to clear settings:', error);
+          setStatus('Could not clear saved settings.', 'error');
+        }
+      }
+
+      function updateJpgQualityControls() {
+        const value = clamp(Number(jpgQualityRange.value), 10, 100);
+        state.jpgQuality = value / 100;
+        jpgQualityRange.value = value;
+        jpgQualityInput.value = value;
+        jpgQualityValue.textContent = value + '%';
+      }
+
+      function updateFitButtons() {
+        document.querySelectorAll('#fitModeButtons button').forEach((button) => {
+          button.classList.toggle('active', button.dataset.fit === state.fitMode);
+        });
+      }
+
+      function updateAlignmentButtons() {
+        document.querySelectorAll('#alignmentButtons button').forEach((button) => {
+          button.classList.toggle('active', button.dataset.align === state.alignment);
+        });
+      }
+
+      function setSourceImage(image) {
+        state.sourceImage = image;
+        state.sourceCrop = createDefaultSourceCrop(image);
+        renderSourceEditor();
+        renderFinalPreview();
+        renderComparison();
+      }
+
+      function setTargetImage(image) {
+        state.targetImage = image;
+        renderTargetEditor();
+        renderFinalPreview();
+        renderComparison();
+      }
+
+      function handleImageSelection(file, type) {
+        if (!file) return;
+        if (!isValidImageFile(file)) {
+          setStatus('Unsupported image format. Please use JPG, JPEG, PNG, or WEBP.', 'error');
+          return;
+        }
+
+        readFileAsImage(file)
+          .then((img) => {
+            if (type === 'source') {
+              setSourceImage(img);
+              setStatus('Source image loaded', 'success');
+            } else {
+              setTargetImage(img);
+              setStatus('Target image loaded', 'success');
+            }
+
+            if (state.sourceImage && state.targetImage) {
+              setStatus('Ready to generate', 'success');
+            }
+          })
+          .catch((error) => {
+            setStatus(error.message || 'Invalid image file.', 'error');
+          });
+      }
+
+      function generateFinalCanvas() {
+        if (!state.sourceImage || !state.targetImage) {
+          setStatus('Please upload both the Source Image and Target Image first.', 'warning');
+          return null;
+        }
+
+        const source = state.sourceImage;
+        const target = state.targetImage;
+        const crop = state.sourceCrop;
+        const finalWidth = target.naturalWidth;
+        const finalHeight = target.naturalHeight;
+        const replacementHeight = Math.max(5, (finalHeight * state.replacementPercent) / 100);
+
+        const final = document.createElement('canvas');
+        final.width = finalWidth;
+        final.height = finalHeight;
+        const ctx = final.getContext('2d');
+
+        ctx.drawImage(target, 0, 0, finalWidth, finalHeight);
+
+        const sourceCropCanvas = document.createElement('canvas');
+        sourceCropCanvas.width = crop.width;
+        sourceCropCanvas.height = crop.height;
+        const sctx = sourceCropCanvas.getContext('2d');
+        sctx.drawImage(source, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+
+        const pieceCanvas = document.createElement('canvas');
+        pieceCanvas.width = finalWidth;
+        pieceCanvas.height = replacementHeight;
+        const pctx = pieceCanvas.getContext('2d');
+
+        const scaledCanvas = document.createElement('canvas');
+        const native = sourceCropCanvas;
+        let scaledWidth = native.width;
+        let scaledHeight = native.height;
+
+        if (state.fitMode === 'contain') {
+          const scale = Math.min(finalWidth / native.width, replacementHeight / native.height);
+          scaledWidth = native.width * scale;
+          scaledHeight = native.height * scale;
+        } else if (state.fitMode === 'cover') {
+          const scale = Math.max(finalWidth / native.width, replacementHeight / native.height);
+          scaledWidth = native.width * scale;
+          scaledHeight = native.height * scale;
+        } else if (state.fitMode === 'stretch') {
+          scaledWidth = finalWidth;
+          scaledHeight = replacementHeight;
+        }
+
+        scaledCanvas.width = Math.max(1, scaledWidth);
+        scaledCanvas.height = Math.max(1, scaledHeight);
+        const scctx = scaledCanvas.getContext('2d');
+        scctx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+        scctx.drawImage(native, 0, 0, native.width, native.height, 0, 0, scaledCanvas.width, scaledCanvas.height);
+
+        if (state.fitMode === 'cover') {
+          const sourceX = state.alignment === 'left'
+            ? 0
+            : state.alignment === 'right'
+              ? Math.max(0, scaledCanvas.width - finalWidth)
+              : Math.max(0, (scaledCanvas.width - finalWidth) / 2);
+          const sourceY = Math.max(0, (scaledCanvas.height - replacementHeight) / 2);
+          const targetSourceWidth = Math.min(scaledCanvas.width, finalWidth);
+          const targetSourceHeight = Math.min(scaledCanvas.height, replacementHeight);
+
+          pctx.drawImage(
+            scaledCanvas,
+            sourceX,
+            sourceY,
+            targetSourceWidth,
+            targetSourceHeight,
+            0,
+            0,
+            finalWidth,
+            replacementHeight
+          );
+        } else if (state.fitMode === 'contain') {
+          const offsetX = state.alignment === 'left'
+            ? 0
+            : state.alignment === 'right'
+              ? finalWidth - scaledCanvas.width
+              : (finalWidth - scaledCanvas.width) / 2;
+          pctx.drawImage(scaledCanvas, 0, 0, scaledCanvas.width, scaledCanvas.height, offsetX, 0, scaledCanvas.width, scaledCanvas.height);
+        } else {
+          const offsetX = state.alignment === 'left'
+            ? 0
+            : state.alignment === 'right'
+              ? finalWidth - scaledCanvas.width
+              : (finalWidth - scaledCanvas.width) / 2;
+          pctx.drawImage(scaledCanvas, 0, 0, scaledCanvas.width, scaledCanvas.height, offsetX, 0, finalWidth, replacementHeight);
+        }
+
+        if (state.blend > 0) {
+          const fadeCanvas = document.createElement('canvas');
+          fadeCanvas.width = finalWidth;
+          fadeCanvas.height = replacementHeight;
+          const fctx = fadeCanvas.getContext('2d');
+          fctx.drawImage(pieceCanvas, 0, 0);
+          const fade = fctx.createLinearGradient(0, replacementHeight - state.blend, 0, replacementHeight);
+          fade.addColorStop(0, 'rgba(0, 0, 0, 0)');
+          fade.addColorStop(1, 'rgba(0, 0, 0, 0.75)');
+          fctx.fillStyle = fade;
+          fctx.fillRect(0, replacementHeight - state.blend, finalWidth, state.blend);
+          ctx.drawImage(fadeCanvas, 0, 0, finalWidth, replacementHeight);
+        } else {
+          ctx.drawImage(pieceCanvas, 0, 0, finalWidth, replacementHeight);
+        }
+
+        return final;
+      }
+
+      function renderFinalPreview() {
+        if (!state.sourceImage || !state.targetImage) {
+          finalCanvas.classList.add('hidden');
+          return;
+        }
+
+        const final = generateFinalCanvas();
+        if (!final) return;
+
+        finalCanvas.width = final.width;
+        finalCanvas.height = final.height;
+        const ctx = finalCanvas.getContext('2d');
+        ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+        ctx.drawImage(final, 0, 0);
+        finalCanvas.classList.remove('hidden');
+        state.previewCanvas = final;
+      }
+
+      function renderComparison() {
+        const source = state.targetImage;
+        if (!source) {
+          beforeCompareCanvas.width = 1200;
+          beforeCompareCanvas.height = 700;
+          afterCompareCanvas.width = 1200;
+          afterCompareCanvas.height = 700;
+          return;
+        }
+
+        const beforeCtx = beforeCompareCanvas.getContext('2d');
+        beforeCompareCanvas.width = source.naturalWidth;
+        beforeCompareCanvas.height = source.naturalHeight;
+        beforeCtx.clearRect(0, 0, beforeCompareCanvas.width, beforeCompareCanvas.height);
+        beforeCtx.drawImage(source, 0, 0, beforeCompareCanvas.width, beforeCompareCanvas.height);
+
+        if (!state.previewCanvas) {
+          afterCompareCanvas.width = source.naturalWidth;
+          afterCompareCanvas.height = source.naturalHeight;
+          const afterCtx = afterCompareCanvas.getContext('2d');
+          afterCtx.clearRect(0, 0, afterCompareCanvas.width, afterCompareCanvas.height);
+          afterCtx.fillStyle = '#edf3ff';
+          afterCtx.fillRect(0, 0, afterCompareCanvas.width, afterCompareCanvas.height);
+          return;
+        }
+
+        afterCompareCanvas.width = state.previewCanvas.width;
+        afterCompareCanvas.height = state.previewCanvas.height;
+        const afterCtx = afterCompareCanvas.getContext('2d');
+        afterCtx.clearRect(0, 0, afterCompareCanvas.width, afterCompareCanvas.height);
+        afterCtx.drawImage(state.previewCanvas, 0, 0);
+      }
+
+      function downloadCanvas(kind) {
+        if (!state.previewCanvas) {
+          setStatus('Generate a preview before downloading.', 'warning');
+          return;
+        }
+
+        const filename = kind === 'png' ? 'merged-image.png' : 'merged-image.jpg';
+        const mimeType = kind === 'png' ? 'image/png' : 'image/jpeg';
+        const quality = kind === 'jpg' ? state.jpgQuality : undefined;
+
+        state.previewCanvas.toBlob((blob) => {
+          if (!blob) {
+            setStatus('The browser could not create the download file.', 'error');
+            return;
+          }
+
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          link.click();
+          URL.revokeObjectURL(url);
+          setStatus('Download started successfully.', 'success');
+        }, mimeType, quality);
+      }
+
+      function resetApplication() {
+        sourceInput.value = '';
+        targetInput.value = '';
+        state.sourceImage = null;
+        state.targetImage = null;
+        state.sourceCrop = null;
+        state.previewCanvas = null;
+        state.dragging = false;
+        state.dragType = null;
+
+        replacementRange.value = 30;
+        replacementInput.value = 30;
+        state.replacementPercent = 30;
+        replacementValue.textContent = '30%';
+
+        blendRange.value = 0;
+        blendInput.value = 0;
+        state.blend = 0;
+        blendValue.textContent = '0 px';
+
+        jpgQualityRange.value = 90;
+        jpgQualityInput.value = 90;
+        state.jpgQuality = 0.9;
+        jpgQualityValue.textContent = '90%';
+
+        state.fitMode = 'cover';
+        state.alignment = 'center';
+        updateFitButtons();
+        updateAlignmentButtons();
+
+        sourceCanvas.width = 800;
+        sourceCanvas.height = 500;
+        targetCanvas.width = 800;
+        targetCanvas.height = 500;
+        finalCanvas.classList.add('hidden');
+        sourceEditorWrap.classList.add('hidden');
+        targetEditorWrap.classList.add('hidden');
+
+        const beforeCtx = beforeCompareCanvas.getContext('2d');
+        beforeCtx.clearRect(0, 0, beforeCompareCanvas.width, beforeCompareCanvas.height);
+        beforeCtx.fillStyle = '#edf3ff';
+        beforeCtx.fillRect(0, 0, beforeCompareCanvas.width, beforeCompareCanvas.height);
+
+        const afterCtx = afterCompareCanvas.getContext('2d');
+        afterCtx.clearRect(0, 0, afterCompareCanvas.width, afterCompareCanvas.height);
+        afterCtx.fillStyle = '#edf3ff';
+        afterCtx.fillRect(0, 0, afterCompareCanvas.width, afterCompareCanvas.height);
+
+        setStatus('Reset complete. Ready for a new image set.', 'success');
+      }
+
+      function startCropDrag(event) {
+        if (!state.sourceImage) return;
+        const point = getCanvasPoint(event, sourceCanvas);
+        const crop = state.sourceCrop;
+        const threshold = 16;
+
+        const topHit = Math.abs(point.y - crop.y) <= threshold && point.x >= crop.x && point.x <= crop.x + crop.width;
+        const bottomHit = Math.abs(point.y - (crop.y + crop.height)) <= threshold && point.x >= crop.x && point.x <= crop.x + crop.width;
+        const inside = point.x >= crop.x && point.x <= crop.x + crop.width && point.y >= crop.y && point.y <= crop.y + crop.height;
+
+        if (topHit) {
+          state.dragging = true;
+          state.dragType = 'crop-top';
+          state.dragStart = { x: point.x, y: point.y, crop };
+          return;
+        }
+
+        if (bottomHit) {
+          state.dragging = true;
+          state.dragType = 'crop-bottom';
+          state.dragStart = { x: point.x, y: point.y, crop };
+          return;
+        }
+
+        if (inside) {
+          state.dragging = true;
+          state.dragType = 'crop-move';
+          state.dragStart = { x: point.x, y: point.y, crop };
+          return;
+        }
+      }
+
+      function handleCropPointerMove(event) {
+        if (!state.dragging || !state.sourceImage) return;
+        const point = getCanvasPoint(event, sourceCanvas);
+        const start = state.dragStart;
+        const crop = state.sourceCrop;
+        const dx = point.x - start.x;
+        const dy = point.y - start.y;
+
+        if (state.dragType === 'crop-move') {
+          crop.x = clamp(start.crop.x + dx, 0, sourceCanvas.width - crop.width);
+          crop.y = clamp(start.crop.y + dy, 0, sourceCanvas.height - crop.height);
+        }
+
+        if (state.dragType === 'crop-top') {
+          const nextY = clamp(start.crop.y + dy, 0, start.crop.y + start.crop.height - 30);
+          const nextHeight = start.crop.height + (start.crop.y - nextY);
+          crop.y = nextY;
+          crop.height = nextHeight;
+        }
+
+        if (state.dragType === 'crop-bottom') {
+          crop.height = clamp(start.crop.height + dy, 40, sourceCanvas.height - crop.y);
+        }
+
+        renderSourceEditor();
+        updateFinalPreviewIfReady();
+      }
+
+      function handleTargetPointerDown(event) {
+        if (!state.targetImage) return;
+        const point = getCanvasPoint(event, targetCanvas);
+        const replacementHeight = (targetCanvas.height * state.replacementPercent) / 100;
+        const activeZone = Math.abs(point.y - replacementHeight) <= 16;
+        if (activeZone) {
+          state.dragging = true;
+          state.dragType = 'target-resize';
+          state.dragStart = { y: point.y, percent: state.replacementPercent };
+        }
+      }
+
+      function handleTargetPointerMove(event) {
+        if (!state.dragging || !state.targetImage || state.dragType !== 'target-resize') return;
+        const point = getCanvasPoint(event, targetCanvas);
+        const deltaY = point.y - state.dragStart.y;
+        const oldPct = state.dragStart.percent;
+        const nextPercent = clamp(oldPct + ((deltaY / targetCanvas.height) * 100), 5, 80);
+        state.replacementPercent = nextPercent;
+        replacementRange.value = nextPercent;
+        replacementInput.value = nextPercent;
+        replacementValue.textContent = Math.round(nextPercent) + '%';
+        renderTargetEditor();
+        updateFinalPreviewIfReady();
+      }
+
+      function updateFinalPreviewIfReady() {
+        if (state.sourceImage && state.targetImage) {
+          renderFinalPreview();
+          renderComparison();
+        }
+      }
+
+      function attachEvents() {
+        sourceInput.addEventListener('change', (event) => {
+          const [file] = event.target.files || [];
+          handleImageSelection(file, 'source');
+        });
+
+        targetInput.addEventListener('change', (event) => {
+          const [file] = event.target.files || [];
+          handleImageSelection(file, 'target');
+        });
+
+        const sourceDropzone = document.getElementById('sourceDropzone');
+        const targetDropzone = document.getElementById('targetDropzone');
+
+        [sourceDropzone, targetDropzone].forEach((dropzone) => {
+          dropzone.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropzone.classList.add('dragover');
+          });
+
+          dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+          });
+
+          dropzone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropzone.classList.remove('dragover');
+            const file = event.dataTransfer.files[0];
+            if (dropzone.id === 'sourceDropzone') {
+              handleImageSelection(file, 'source');
+            } else {
+              handleImageSelection(file, 'target');
+            }
+          });
+
+          dropzone.addEventListener('click', () => {
+            if (dropzone.id === 'sourceDropzone') {
+              sourceInput.click();
+            } else {
+              targetInput.click();
+            }
+          });
+
+          dropzone.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              if (dropzone.id === 'sourceDropzone') sourceInput.click();
+              else targetInput.click();
+            }
+          });
+        });
+
+        replacementRange.addEventListener('input', () => {
+          state.replacementPercent = clamp(Number(replacementRange.value), 5, 80);
+          replacementInput.value = state.replacementPercent;
+          replacementValue.textContent = state.replacementPercent + '%';
+          renderTargetEditor();
+          updateFinalPreviewIfReady();
+          saveSettingsToLocalStorage(true);
+        });
+
+        replacementInput.addEventListener('input', () => {
+          const value = clamp(Number(replacementInput.value) || 30, 5, 80);
+          state.replacementPercent = value;
+          replacementRange.value = value;
+          replacementValue.textContent = value + '%';
+          renderTargetEditor();
+          updateFinalPreviewIfReady();
+          saveSettingsToLocalStorage(true);
+        });
+
+        blendRange.addEventListener('input', () => {
+          updateBlendControls();
+          updateFinalPreviewIfReady();
+          saveSettingsToLocalStorage(true);
+        });
+
+        blendInput.addEventListener('input', () => {
+          const value = clamp(Number(blendInput.value) || 0, 0, 50);
+          state.blend = value;
+          blendRange.value = value;
+          blendValue.textContent = value + ' px';
+          updateFinalPreviewIfReady();
+          saveSettingsToLocalStorage(true);
+        });
+
+        jpgQualityRange.addEventListener('input', () => {
+          updateJpgQualityControls();
+          saveSettingsToLocalStorage(true);
+        });
+
+        jpgQualityInput.addEventListener('input', () => {
+          const value = clamp(Number(jpgQualityInput.value) || 90, 10, 100);
+          state.jpgQuality = value / 100;
+          jpgQualityRange.value = value;
+          jpgQualityValue.textContent = value + '%';
+          saveSettingsToLocalStorage(true);
+        });
+
+        document.getElementById('fitModeButtons').addEventListener('click', (event) => {
+          const button = event.target.closest('button[data-fit]');
+          if (!button) return;
+          state.fitMode = button.dataset.fit || 'cover';
+          updateFitButtons();
+          updateFinalPreviewIfReady();
+          saveSettingsToLocalStorage(true);
+        });
+
+        document.getElementById('alignmentButtons').addEventListener('click', (event) => {
+          const button = event.target.closest('button[data-align]');
+          if (!button) return;
+          state.alignment = button.dataset.align || 'center';
+          updateAlignmentButtons();
+          updateFinalPreviewIfReady();
+          saveSettingsToLocalStorage(true);
+        });
+
+        document.getElementById('generateBtn').addEventListener('click', () => {
+          const final = generateFinalCanvas();
+          if (!final) return;
+
+          finalCanvas.width = final.width;
+          finalCanvas.height = final.height;
+          const ctx = finalCanvas.getContext('2d');
+          ctx.clearRect(0, 0, finalCanvas.width, finalCanvas.height);
+          ctx.drawImage(final, 0, 0);
+          finalCanvas.classList.remove('hidden');
+          state.previewCanvas = final;
+          renderComparison();
+          setStatus('Image generated successfully', 'success');
+        });
+
+        document.getElementById('saveSettingsBtn').addEventListener('click', () => saveSettingsToLocalStorage(false));
+        document.getElementById('loadSettingsBtn').addEventListener('click', () => loadSettingsFromLocalStorage());
+        document.getElementById('clearSettingsBtn').addEventListener('click', () => clearSavedSettings());
+        document.getElementById('downloadPngBtn').addEventListener('click', () => downloadCanvas('png'));
+        document.getElementById('downloadJpgBtn').addEventListener('click', () => downloadCanvas('jpg'));
+        document.getElementById('resetBtn').addEventListener('click', resetApplication);
+
+        sourceCanvas.addEventListener('pointerdown', startCropDrag);
+        sourceCanvas.addEventListener('pointermove', handleCropPointerMove);
+        sourceCanvas.addEventListener('pointerup', () => {
+          state.dragging = false;
+          state.dragType = null;
+          state.dragStart = null;
+        });
+        sourceCanvas.addEventListener('pointerleave', () => {
+          state.dragging = false;
+          state.dragType = null;
+          state.dragStart = null;
+        });
+
+        targetCanvas.addEventListener('pointerdown', handleTargetPointerDown);
+        targetCanvas.addEventListener('pointermove', handleTargetPointerMove);
+        targetCanvas.addEventListener('pointerup', () => {
+          state.dragging = false;
+          state.dragType = null;
+          state.dragStart = null;
+        });
+        targetCanvas.addEventListener('pointerleave', () => {
+          state.dragging = false;
+          state.dragType = null;
+          state.dragStart = null;
+        });
+      }
+
+      updateFitButtons();
+      updateAlignmentButtons();
+      updateReplacementControls();
+      updateBlendControls();
+      updateJpgQualityControls();
+      attachEvents();
+      loadSettingsFromLocalStorage();
+      setStatus('Ready to load images.', 'success');
+    </script>
+  </body>
+</html>
