@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Conversation</title>
+    <style>
+      :root {
+        --primary-blue: #0866ff;
+        --incoming-bg: #f1f1f1;
+        --main-bg: #ffffff;
+        --primary-text: #1c1e21;
+        --secondary-text: #65676b;
+        --pink-accent: #ec4899;
+        --border: #e8eaed;
+        --soft-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        --message-self: linear-gradient(135deg, #0b6cff, #1f7fff);
+        --message-other: #f3f4f6;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --surface: #f7f8fa;
+        --surface-2: #eef2ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--main-bg);
+        color: var(--primary-text);
+      }
+
+      body {
+        min-height: 100vh;
+      }
+
+      button, input, textarea {
+        font: inherit;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #f5f7ff 0%, #ffffff 100%);
+        padding: 24px;
+      }
+
+      .screen {
+        width: min(100%, 1200px);
+        height: min(92vh, 920px);
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        border-radius: 24px;
+        box-shadow: var(--soft-shadow);
+        overflow: hidden;
+      }
+
+      #welcomeScreen {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #fff 0%, #f5f7ff 100%);
+      }
+
+      .welcome-panel {
+        width: min(100%, 640px);
+        margin: auto;
+        padding: clamp(20px, 4vw, 48px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 12px;
+      }
+
+      .logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #fef3f8, #dbeafe);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 28px rgba(8, 102, 255, 0.18);
+        font-size: 30px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.1rem, 3vw, 3.1rem);
+        letter-spacing: -0.04em;
+      }
+
+      .subtitle {
+        margin: 8px 0 28px;
+        color: var(--secondary-text);
+        text-align: center;
+        font-size: 1.05rem;
+      }
+
+      .role-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .role-card {
+        border: 2px solid var(--border);
+        background: #fff;
+        border-radius: 18px;
+        padding: 24px 16px;
+        min-height: 150px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+      }
+
+      .role-card:hover,
+      .role-card:focus-visible {
+        border-color: rgba(8, 102, 255, 0.4);
+        box-shadow: 0 12px 24px rgba(8, 102, 255, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .role-card.active {
+        border-color: var(--primary-blue);
+        background: var(--surface-2);
+        box-shadow: 0 12px 28px rgba(8, 102, 255, 0.15);
+      }
+
+      .role-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 30px;
+        margin-bottom: 12px;
+      }
+
+      .role-card[data-role="Boy"] .role-icon {
+        background: #dbeafe;
+      }
+
+      .role-card[data-role="Girl"] .role-icon {
+        background: #fce7f3;
+      }
+
+      .role-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+
+      .panel-card {
+        background: rgba(255,255,255,0.95);
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        padding: 18px;
+        margin-top: 18px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .field label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .field input,
+      .field textarea {
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 12px;
+        padding: 0.9rem 1rem;
+        color: var(--primary-text);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        width: 100%;
+      }
+
+      .field textarea {
+        min-height: 86px;
+        resize: vertical;
+      }
+
+      .field input:focus,
+      .field textarea:focus {
+        outline: none;
+        border-color: rgba(8, 102, 255, 0.5);
+        box-shadow: 0 0 0 3px rgba(8, 102, 255, 0.12);
+      }
+
+      .primary-btn,
+      .secondary-btn,
+      .icon-btn,
+      .ghost-btn,
+      .send-btn {
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .primary-btn,
+      .send-btn {
+        background: var(--primary-blue);
+        color: white;
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 0.9rem 1.1rem;
+      }
+
+      .primary-btn:hover,
+      .send-btn:hover:not(:disabled) {
+        filter: brightness(1.04);
+      }
+
+      .primary-btn:disabled,
+      .send-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .secondary-btn {
+        background: #eef2ff;
+        color: var(--primary-blue);
+        border-radius: 12px;
+        padding: 0.8rem 1rem;
+        font-weight: 600;
+      }
+
+      .ghost-btn {
+        background: transparent;
+        color: var(--secondary-text);
+        border-radius: 10px;
+        padding: 0.5rem 0.8rem;
+      }
+
+      .ghost-btn:hover {
+        background: rgba(15, 23, 42, 0.04);
+      }
+
+      .status-box {
+        margin-top: 16px;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        background: #f4f5f7;
+        color: var(--secondary-text);
+        font-size: 0.95rem;
+      }
+
+      .status-box.error {
+        background: rgba(239, 68, 68, 0.08);
+        color: #b91c1c;
+      }
+
+      .status-box.success {
+        background: rgba(34, 197, 94, 0.08);
+        color: #166534;
+      }
+
+      .chat-screen {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255,255,255,0.96);
+      }
+
+      .header-left,
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .profile-pill {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, #0ea5e9, #6366f1);
+        box-shadow: 0 8px 18px rgba(79, 70, 229, 0.18);
+      }
+
+      .avatar.other {
+        background: linear-gradient(135deg, #f472b6, #ec4899);
+      }
+
+      .user-meta {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .user-name {
+        font-weight: 700;
+      }
+
+      .user-status {
+        font-size: 0.76rem;
+        color: var(--secondary-text);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .icon-btn {
+        background: #f3f4f6;
+        color: var(--primary-text);
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .icon-btn:hover {
+        background: #ebedf0;
+      }
+
+      .chat-body {
+        position: relative;
+        flex: 1;
+        background: linear-gradient(180deg, #fafbff, #ffffff);
+        overflow: hidden;
+      }
+
+      .message-scroll {
+        height: 100%;
+        overflow-y: auto;
+        padding: 18px 16px 20px;
+        scroll-behavior: smooth;
+      }
+
+      .message-list {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .date-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 14px 0;
+        color: var(--secondary-text);
+        font-size: 0.76rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .date-divider::before,
+      .date-divider::after {
+        content: "";
+        height: 1px;
+        background: var(--border);
+        flex: 1;
+      }
+
+      .message-row {
+        display: flex;
+        margin: 4px 0 10px;
+      }
+
+      .message-row.self {
+        justify-content: flex-end;
+      }
+
+      .message-row.other {
+        justify-content: flex-start;
+      }
+
+      .bubble-wrap {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        max-width: min(72%, 520px);
+      }
+
+      .bubble-wrap.other {
+        align-items: flex-end;
+      }
+
+      .bubble-wrap.self {
+        flex-direction: row-reverse;
+      }
+
+      .bubble {
+        display: inline-block;
+        border-radius: 20px;
+        padding: 12px 14px 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        line-height: 1.5;
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+
+      .message-sender {
+        color: var(--secondary-text);
+        font-size: 0.72rem;
+        font-weight: 600;
+        margin: 0 8px 4px;
+      }
+
+      .message-sender.self {
+        text-align: right;
+      }
+
+      .bubble.self {
+        background: var(--message-self);
+        color: white;
+        border-bottom-right-radius: 8px;
+      }
+
+      .bubble.other {
+        background: var(--message-other);
+        color: var(--primary-text);
+        border-bottom-left-radius: 8px;
+      }
+
+      .meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+        font-size: 0.74rem;
+        color: rgba(255,255,255,0.85);
+        padding-top: 5px;
+      }
+
+      .meta-row.other {
+        justify-content: flex-start;
+        color: var(--secondary-text);
+      }
+
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.75);
+        display: inline-block;
+      }
+
+      .meta-row.other .status-dot {
+        background: rgba(18, 24, 38, 0.45);
+      }
+
+      .composer {
+        border-top: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.98);
+        padding: 12px 14px 14px;
+      }
+
+      .composer-inner {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+      }
+
+      .composer-tools {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .composer textarea {
+        flex: 1;
+        min-height: 48px;
+        max-height: 160px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: #f8f9fb;
+        padding: 0.8rem 1rem;
+        resize: none;
+      }
+
+      .composer textarea:focus {
+        outline: none;
+        border-color: rgba(8, 102, 255, 0.4);
+        box-shadow: 0 0 0 3px rgba(8, 102, 255, 0.08);
+      }
+
+      .send-btn {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+      }
+
+      .typing-indicator {
+        color: var(--secondary-text);
+        font-size: 0.8rem;
+        margin: 0 0 8px;
+        min-height: 16px;
+      }
+
+      .jump-indicator {
+        position: absolute;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(8,102,255,0.94);
+        color: white;
+        border: none;
+        border-radius: 999px;
+        padding: 0.7rem 1rem;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(8,102,255,0.25);
+      }
+
+      .search-panel {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        width: min(360px, calc(100% - 32px));
+        background: rgba(255,255,255,0.98);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--soft-shadow);
+        padding: 12px;
+        z-index: 10;
+      }
+
+      .search-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .search-results {
+        max-height: 260px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+
+      .search-result {
+        width: 100%;
+        text-align: left;
+        border: none;
+        background: #f7f8fa;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+
+      .search-result small {
+        display: block;
+        color: var(--secondary-text);
+        margin-bottom: 6px;
+      }
+
+      .search-result p {
+        margin: 0;
+        color: var(--primary-text);
+      }
+
+      .action-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 10px;
+      }
+
+      .muted {
+        color: var(--secondary-text);
+      }
+
+      @media (max-width: 700px) {
+        .screen {
+          width: 100%;
+          height: 100vh;
+          border-radius: 0;
+        }
+
+        .app-shell {
+          padding: 0;
+        }
+
+        .role-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .chat-header {
+          padding: 10px 12px;
+        }
+
+        .message-scroll {
+          padding: 10px 12px 18px;
+        }
+
+        .bubble-wrap {
+          max-width: 82%;
+        }
+
+        .composer {
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <div id="welcomeScreen" class="screen">
+        <div class="welcome-panel">
+          <div class="brand">
+            <div class="logo">💬</div>
+            <h1>Our Conversation</h1>
+          </div>
+          <p class="subtitle">A little space just for us</p>
+
+          <div class="role-grid" id="roleGrid">
+            <button class="role-card" type="button" data-role="Boy">
+              <span class="role-icon">👦</span>
+              <div class="role-title">I'm a Boy</div>
+            </button>
+            <button class="role-card" type="button" data-role="Girl">
+              <span class="role-icon">👧</span>
+              <div class="role-title">I'm a Girl</div>
+            </button>
+          </div>
+
+          <div class="panel-card">
+            <div class="form-row">
+              <div class="field">
+                <label for="roomCodeInput">Private room code or invitation link</label>
+                <input id="roomCodeInput" type="text" placeholder="Optional — leave blank to start a new conversation" />
+              </div>
+            </div>
+            <p class="muted" style="margin: 12px 0 0; font-size: 0.9rem;">No email or password needed. To join the same conversation on another device, open the invite link shared from the chat.</p>
+
+            <div class="action-line">
+              <button type="button" class="secondary-btn" id="clearRoomBtn">Clear invite</button>
+              <button type="button" class="primary-btn" id="continueBtn" disabled>Start chatting</button>
+            </div>
+
+            <div id="welcomeStatus" class="status-box hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="chatScreen" class="screen chat-screen hidden">
+        <header class="chat-header">
+          <div class="header-left">
+            <button type="button" class="icon-btn" id="backBtn" aria-label="Go back">←</button>
+            <div class="profile-pill">
+              <div class="avatar other" id="otherAvatar">?</div>
+              <div class="user-meta">
+                <span class="user-name" id="roomTitle">Our Conversation</span>
+                <span class="user-status" id="connectionStatus">Connecting…</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="header-right">
+            <div class="header-actions">
+              <button type="button" class="secondary-btn" id="inviteBtn" aria-label="Share invite">Invite</button>
+              <button type="button" class="icon-btn" id="searchBtn" aria-label="Search">⌕</button>
+            </div>
+          </div>
+        </header>
+
+        <div class="chat-body">
+          <div id="searchPanel" class="search-panel hidden">
+            <div class="search-header">
+              <strong>Search messages</strong>
+              <button type="button" class="ghost-btn" id="closeSearchBtn">Close</button>
+            </div>
+            <div class="field" style="margin-top: 12px;">
+              <input id="searchInput" type="text" autocomplete="off" placeholder="Search this room" />
+            </div>
+            <div class="action-line">
+              <span class="muted" id="searchMeta">Search room history</span>
+              <button type="button" class="primary-btn" id="runSearchBtn">Search</button>
+            </div>
+            <div id="searchResults" class="search-results"></div>
+          </div>
+
+          <div id="messagesContainer" class="message-scroll">
+            <div id="olderMessagesLoader" class="muted hidden" style="padding: 6px 0 10px; text-align: center;">Loading older messages…</div>
+            <div id="messagesList" class="message-list"></div>
+          </div>
+
+          <button type="button" id="jumpToLatestBtn" class="jump-indicator hidden">Jump to latest</button>
+        </div>
+
+        <div class="composer">
+          <div id="typingIndicator" class="typing-indicator">&nbsp;</div>
+          <div class="composer-inner">
+            <div class="composer-tools">
+              <button type="button" class="icon-btn" id="emojiBtn" aria-label="Emoji">😊</button>
+            </div>
+            <textarea id="composerInput" rows="1" placeholder="Write a message…"></textarea>
+            <button type="button" class="send-btn" id="sendBtn" title="Send message">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const STORAGE_KEY = 'our_conversation_prefs_v1';
+      const ROOM_PAGE_SIZE = 30;
+
+      const supabaseUrl = 'https://avvuwqkgloatsuqcxnal.supabase.co';
+      const supabaseAnonKey = 'sb_publishable_3vf3hQBCJ-dsLX8frFCRDQ_Tjcry0GB';
+
+      const state = {
+        role: null,
+        roleSelected: false,
+        roomId: null,
+        roomCode: null,
+        room: null,
+        currentUser: null,
+        currentUserId: null,
+        memberRoles: {},
+        channel: null,
+        messages: [],
+        oldestCreatedAt: null,
+        hasMore: true,
+        loadingOlder: false,
+        searchOpen: false,
+        isNearBottom: true,
+        unreadCount: 0,
+        searchResults: [],
+        typingTimer: null,
+        typingLabel: ''
+      };
+
+      const elements = {
+        welcomeScreen: document.getElementById('welcomeScreen'),
+        chatScreen: document.getElementById('chatScreen'),
+        roleButtons: [...document.querySelectorAll('.role-card')],
+        roomCodeInput: document.getElementById('roomCodeInput'),
+        continueBtn: document.getElementById('continueBtn'),
+        welcomeStatus: document.getElementById('welcomeStatus'),
+        clearRoomBtn: document.getElementById('clearRoomBtn'),
+        roomTitle: document.getElementById('roomTitle'),
+        otherAvatar: document.getElementById('otherAvatar'),
+        connectionStatus: document.getElementById('connectionStatus'),
+        backBtn: document.getElementById('backBtn'),
+        inviteBtn: document.getElementById('inviteBtn'),
+        searchBtn: document.getElementById('searchBtn'),
+        messagesContainer: document.getElementById('messagesContainer'),
+        messagesList: document.getElementById('messagesList'),
+        olderMessagesLoader: document.getElementById('olderMessagesLoader'),
+        composerInput: document.getElementById('composerInput'),
+        sendBtn: document.getElementById('sendBtn'),
+        jumpToLatestBtn: document.getElementById('jumpToLatestBtn'),
+        emojiBtn: document.getElementById('emojiBtn'),
+        typingIndicator: document.getElementById('typingIndicator'),
+        searchPanel: document.getElementById('searchPanel'),
+        searchInput: document.getElementById('searchInput'),
+        searchResults: document.getElementById('searchResults'),
+        searchMeta: document.getElementById('searchMeta'),
+        closeSearchBtn: document.getElementById('closeSearchBtn'),
+        runSearchBtn: document.getElementById('runSearchBtn')
+      };
+
+      function setStatus(message, kind = '') {
+        elements.welcomeStatus.textContent = message || '';
+        elements.welcomeStatus.classList.toggle('hidden', !message);
+        elements.welcomeStatus.classList.toggle('error', kind === 'error');
+        elements.welcomeStatus.classList.toggle('success', kind === 'success');
+      }
+
+      function savePreferences() {
+        const prefs = {
+          role: state.role,
+          roomId: state.roomId,
+          roomCode: state.roomCode
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      }
+
+      function loadPreferences() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const prefs = JSON.parse(raw);
+          state.role = prefs.role || 'Boy';
+          state.roomId = prefs.roomId || null;
+          state.roomCode = prefs.roomCode || null;
+          updateRoleSelection();
+        } catch (error) {
+          console.warn('Failed to load saved preferences:', error);
+        }
+      }
+
+      function updateRoleSelection() {
+        elements.roleButtons.forEach(button => {
+          const active = state.roleSelected && button.dataset.role === state.role;
+          button.classList.toggle('active', active);
+        });
+        elements.continueBtn.disabled = !state.roleSelected;
+      }
+
+      function initRoleButtons() {
+        elements.roleButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            state.role = button.dataset.role;
+            state.roleSelected = true;
+            updateRoleSelection();
+            savePreferences();
+          });
+        });
+      }
+
+      function ensureSupabaseReady() {
+        if (!supabaseUrl || supabaseUrl.includes('PASTE_YOUR_SUPABASE') || !supabaseAnonKey || supabaseAnonKey.includes('PASTE_YOUR_SUPABASE')) {
+          throw new Error('Add your Supabase project URL and anon key in index.html before running the app.');
+        }
+      }
+
+      const supabaseClient = (function initSupabase() {
+        try {
+          ensureSupabaseReady();
+          return window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true
+            }
+          });
+        } catch (error) {
+          console.warn(error.message);
+          return null;
+        }
+      })();
+
+      function showScreen(screenName) {
+        const isChat = screenName === 'chat';
+        elements.welcomeScreen.classList.toggle('hidden', isChat);
+        elements.chatScreen.classList.toggle('hidden', !isChat);
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function formatTime(dateString) {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat(undefined, {
+          hour: 'numeric',
+          minute: '2-digit'
+        }).format(date);
+      }
+
+      function formatDateForDivider(dateString) {
+        const date = new Date(dateString);
+        const today = new Date();
+        const diffDays = Math.round((new Date(date.getFullYear(), date.getMonth(), date.getDate()) - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000);
+
+        if (diffDays === 0) return 'Today';
+        if (diffDays === -1) return 'Yesterday';
+        return new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(date);
+      }
+
+      function getMessageDateKey(dateString) {
+        const date = new Date(dateString);
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      function renderSearchResults(results) {
+        elements.searchResults.innerHTML = '';
+        if (!results.length) {
+          elements.searchResults.innerHTML = '<div class="muted" style="padding:12px 0;">No matching messages.</div>';
+          return;
+        }
+
+        results.forEach(result => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'search-result';
+          button.innerHTML = `
+            <small>${escapeHtml(new Date(result.created_at).toLocaleString())}</small>
+            <p>${escapeHtml(result.content)}</p>
+          `;
+          button.addEventListener('click', () => {
+            jumpToMessage(result.id);
+            elements.searchPanel.classList.add('hidden');
+          });
+          elements.searchResults.appendChild(button);
+        });
+      }
+
+      function renderMessages() {
+        const list = elements.messagesList;
+        list.innerHTML = '';
+        if (!state.messages.length) {
+          list.innerHTML = '<div class="muted" style="padding:20px; text-align:center;">No messages yet. Start the conversation.</div>';
+          return;
+        }
+
+        const sorted = [...state.messages].sort((a, b) => {
+          const aTime = new Date(a.created_at).getTime();
+          const bTime = new Date(b.created_at).getTime();
+          if (aTime === bTime) return String(a.id).localeCompare(String(b.id));
+          return aTime - bTime;
+        });
+
+        let lastDateKey = null;
+        let lastSender = null;
+
+        sorted.forEach((message, index) => {
+          const senderRole = message.sender_role || state.memberRoles[message.sender_id] || (message.sender_id === state.currentUserId ? state.role : (state.role === 'Boy' ? 'Girl' : 'Boy'));
+          const isSelf = senderRole === state.role;
+          const dateKey = getMessageDateKey(message.created_at);
+          if (lastDateKey !== dateKey) {
+            lastDateKey = dateKey;
+            const divider = document.createElement('div');
+            divider.className = 'date-divider';
+            divider.textContent = formatDateForDivider(message.created_at);
+            list.appendChild(divider);
+          }
+
+          const row = document.createElement('div');
+          row.className = `message-row ${isSelf ? 'self' : 'other'}`;
+
+          const wrap = document.createElement('div');
+          wrap.className = `bubble-wrap ${isSelf ? 'self' : 'other'}`;
+
+          const avatar = document.createElement('div');
+          avatar.className = `avatar ${senderRole === 'Girl' ? 'other' : ''}`;
+          avatar.textContent = senderRole === 'Boy' ? 'B' : 'G';
+          avatar.title = senderRole;
+
+          const bubbleCol = document.createElement('div');
+          bubbleCol.style.display = 'flex';
+          bubbleCol.style.flexDirection = 'column';
+
+          const bubble = document.createElement('div');
+          bubble.className = `bubble ${isSelf ? 'self' : 'other'}`;
+          bubble.textContent = message.content;
+
+          const senderLabel = document.createElement('div');
+          senderLabel.className = `message-sender ${isSelf ? 'self' : 'other'}`;
+          senderLabel.textContent = senderRole;
+
+          const meta = document.createElement('div');
+          meta.className = `meta-row ${isSelf ? 'self' : 'other'}`;
+          const timeStamp = document.createElement('span');
+          timeStamp.textContent = formatTime(message.created_at);
+          meta.appendChild(timeStamp);
+          if (isSelf) {
+            const dot = document.createElement('span');
+            dot.className = 'status-dot';
+            meta.appendChild(dot);
+          }
+          bubbleCol.appendChild(senderLabel);
+          bubbleCol.appendChild(bubble);
+          bubbleCol.appendChild(meta);
+
+          if (!isSelf) {
+            wrap.appendChild(avatar);
+          }
+          wrap.appendChild(bubbleCol);
+          if (isSelf) {
+            wrap.appendChild(avatar);
+          }
+
+          row.appendChild(wrap);
+          list.appendChild(row);
+          lastSender = isSelf ? state.role : (state.role === 'Boy' ? 'Girl' : 'Boy');
+        });
+
+        if (state.isNearBottom) {
+          requestAnimationFrame(() => scrollToBottom(true));
+        }
+      }
+
+      function scrollToBottom(force = false) {
+        const el = elements.messagesContainer;
+        if (!el) return;
+        if (force || state.isNearBottom) {
+          el.scrollTop = el.scrollHeight;
+        }
+      }
+
+      function isNearBottom() {
+        const el = elements.messagesContainer;
+        const threshold = 180;
+        return el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+      }
+
+      function updateMessagesScrollState() {
+        state.isNearBottom = isNearBottom();
+        const visible = !state.isNearBottom;
+        elements.jumpToLatestBtn.classList.toggle('hidden', !visible);
+      }
+
+      function addMessage(message) {
+        const next = [...state.messages];
+        const idx = next.findIndex(item => item.id === message.id);
+        if (idx >= 0) {
+          next[idx] = message;
+        } else {
+          next.push(message);
+        }
+        state.messages = next;
+        renderMessages();
+      }
+
+      function mergeMessages(newMessages) {
+        const map = new Map(state.messages.map(item => [item.id, item]));
+        newMessages.forEach(message => map.set(message.id, message));
+        state.messages = [...map.values()].sort((a, b) => {
+          const aTime = new Date(a.created_at).getTime();
+          const bTime = new Date(b.created_at).getTime();
+          if (aTime === bTime) return String(a.id).localeCompare(String(b.id));
+          return aTime - bTime;
+        });
+      }
+
+      async function saveProfile(role) {
+        if (!supabaseClient || !state.currentUserId) return;
+        const displayName = role === 'Boy' ? 'Boy' : 'Girl';
+        const { error } = await supabaseClient.from('profiles').upsert({
+          id: state.currentUserId,
+          display_name: displayName,
+          role: role,
+          created_at: new Date().toISOString()
+        }, { onConflict: 'id' });
+        if (error) {
+          console.warn('Profile sync failed:', error);
+        }
+      }
+
+      async function createRoom() {
+        if (!supabaseClient) {
+          setStatus('Supabase is not configured yet. Add your project URL and public anon key.', 'error');
+          return;
+        }
+        const { data, error } = await supabaseClient.rpc('create_room_for_current_user', {
+          p_role: state.role
+        });
+        if (error) throw error;
+        const room = Array.isArray(data) ? data[0] : data;
+        if (!room) throw new Error('The room could not be created. Please try again.');
+
+        state.roomId = room.room_id;
+        state.roomCode = room.invite_code;
+        state.room = { id: room.room_id, room_name: room.room_name, invite_code: room.invite_code };
+        savePreferences();
+        return room;
+      }
+
+      async function joinRoomByCode(code) {
+        if (!supabaseClient) {
+          setStatus('Supabase is not configured yet. Add your project URL and anon key.', 'error');
+          return;
+        }
+        const normalized = String(code || '').trim();
+        if (!normalized) {
+          throw new Error('Please enter a valid room code or invitation URL.');
+        }
+
+        let codeValue = normalized;
+        try {
+          const parsed = new URL(normalized);
+          codeValue = parsed.searchParams.get('code') || parsed.searchParams.get('room') || normalized;
+        } catch {
+          codeValue = normalized.replace(/^.*(?:code|room)=/i, '');
+        }
+        const cleanedCode = codeValue.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        const { data, error } = await supabaseClient.rpc('join_room_by_invite', {
+          p_invite_code: cleanedCode,
+          p_role: state.role
+        });
+        if (error) throw error;
+        const room = Array.isArray(data) ? data[0] : data;
+        if (!room) throw new Error('This room code is invalid or expired.');
+
+        state.roomId = room.room_id;
+        state.roomCode = room.invite_code;
+        state.room = { id: room.room_id, room_name: room.room_name, invite_code: room.invite_code };
+        savePreferences();
+        return room;
+      }
+
+      async function ensureRoomAccess() {
+        const codeValue = (elements.roomCodeInput.value || '').trim();
+        if (state.roomId) {
+          return;
+        }
+        if (codeValue) {
+          await joinRoomByCode(codeValue);
+          return;
+        }
+        await createRoom();
+      }
+
+      function buildRoomLink() {
+        if (!state.roomCode) return '';
+        const inviteUrl = new URL(window.location.href);
+        inviteUrl.search = '';
+        inviteUrl.hash = '';
+        inviteUrl.searchParams.set('code', state.roomCode);
+        return inviteUrl.toString();
+      }
+
+      async function loadRoomMeta() {
+        const { data: membersData, error: memberError } = await supabaseClient.from('room_members').select('room_id, role, user_id').eq('room_id', state.roomId);
+        if (memberError) throw memberError;
+
+        if (membersData.length === 0) {
+          throw new Error('This room is empty or you were removed.');
+        }
+
+        state.memberRoles = Object.fromEntries(membersData.map(member => [member.user_id, member.role]));
+        const ownMembership = membersData.find(member => member.user_id === state.currentUserId);
+        if (ownMembership) {
+          state.role = ownMembership.role;
+          state.roleSelected = true;
+        }
+        const otherMember = membersData.find(member => member.user_id !== state.currentUserId);
+        const roleLabel = otherMember ? (otherMember.role || 'Girl') : (state.role === 'Boy' ? 'Girl' : 'Boy');
+        elements.otherAvatar.textContent = roleLabel === 'Boy' ? 'B' : 'G';
+        elements.otherAvatar.title = roleLabel;
+
+        const roomTitle = 'Our Conversation';
+        elements.roomTitle.textContent = roomTitle;
+        elements.connectionStatus.textContent = 'Live now';
+      }
+
+      async function fetchMessages(options = {}) {
+        const offset = options.offset || 'initial';
+        let query = supabaseClient.from('messages').select('*').eq('room_id', state.roomId).order('created_at', { ascending: true }).order('id', { ascending: true });
+
+        if (offset === 'older') {
+          if (!state.oldestCreatedAt) return { data: [] };
+          query = query.lt('created_at', state.oldestCreatedAt);
+        }
+
+        if (offset === 'older') {
+          elements.olderMessagesLoader.classList.remove('hidden');
+        }
+
+        const { data, error } = await query.limit(ROOM_PAGE_SIZE);
+        if (error) throw error;
+        if (!data || !data.length) {
+          if (offset === 'older') state.hasMore = false;
+          elements.olderMessagesLoader.classList.add('hidden');
+          return { data: [] };
+        }
+
+        if (offset === 'initial') {
+          state.messages = [];
+          state.oldestCreatedAt = data[0]?.created_at || null;
+          mergeMessages(data);
+          if (data.length < ROOM_PAGE_SIZE) {
+            state.hasMore = false;
+          }
+        } else {
+          const olderMessages = data.filter(item => !state.messages.some(existing => existing.id === item.id));
+          const sortedOlder = olderMessages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          if (sortedOlder.length) {
+            state.messages = [...sortedOlder, ...state.messages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            state.oldestCreatedAt = state.messages[0]?.created_at || null;
+          }
+          if (sortedOlder.length < ROOM_PAGE_SIZE) {
+            state.hasMore = false;
+          }
+        }
+
+        elements.olderMessagesLoader.classList.add('hidden');
+        renderMessages();
+        return { data };
+      }
+
+      async function initialRoomLoad() {
+        if (!supabaseClient || !state.roomId) return;
+        try {
+          const { data: roomData, error: roomError } = await supabaseClient.from('chat_rooms').select('*').eq('id', state.roomId).single();
+          if (roomError || !roomData) {
+            throw new Error('This room could not be found.');
+          }
+          state.room = roomData;
+          state.roomCode = roomData.invite_code;
+          await loadRoomMeta();
+          await fetchMessages({ offset: 'initial' });
+          listenForRealtime();
+          scrollToBottom(true);
+          showScreen('chat');
+        } catch (error) {
+          console.error(error);
+          setStatus(error.message || 'Unable to load the room.', 'error');
+        }
+      }
+
+      function listenForRealtime() {
+        if (!supabaseClient || !state.roomId) return;
+        if (state.channel) {
+          supabaseClient.removeChannel(state.channel);
+        }
+
+        const channelName = `chat-room-${state.roomId}`;
+        state.channel = supabaseClient.channel(channelName, { config: { broadcast: { self: false }, presence: { key: state.currentUserId } } });
+
+        state.channel.on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `room_id=eq.${state.roomId}`
+        }, (payload) => {
+          const message = payload.new;
+          const alreadyExists = state.messages.some(item => item.id === message.id);
+          if (!alreadyExists) {
+            mergeMessages([message]);
+            renderMessages();
+            const incomingIsMine = message.sender_id === state.currentUserId;
+            if (!incomingIsMine && state.isNearBottom) {
+              scrollToBottom(true);
+            } else if (!incomingIsMine) {
+              state.unreadCount += 1;
+              elements.jumpToLatestBtn.textContent = `Jump to latest (${state.unreadCount})`;
+              elements.jumpToLatestBtn.classList.remove('hidden');
+            }
+          }
+        });
+
+        state.channel.on('presence', { event: 'sync' }, () => {
+          const presenceState = state.channel.presenceState();
+          const typingUsers = Object.values(presenceState).filter(entry => {
+            const val = entry && entry[0] ? entry[0] : null;
+            return val && val.isTyping && val.userId !== state.currentUserId;
+          });
+          if (typingUsers.length) {
+            const label = typingUsers[0][0]?.role || 'Someone';
+            elements.typingIndicator.textContent = `${label} is typing...`;
+          } else {
+            elements.typingIndicator.textContent = ' ';
+          }
+        });
+
+        state.channel.on('broadcast', { event: 'typing' }, (payload) => {
+          const actor = payload.payload;
+          if (!actor || actor.userId === state.currentUserId) return;
+          if (actor.isTyping) {
+            elements.typingIndicator.textContent = `${actor.role} is typing...`;
+          } else {
+            elements.typingIndicator.textContent = ' ';
+          }
+        });
+
+        state.channel.subscribe((status) => {
+          elements.connectionStatus.textContent = status === 'SUBSCRIBED' ? 'Live now' : 'Reconnecting…';
+        });
+      }
+
+      async function handleContinue() {
+        if (!state.roleSelected || !state.role) {
+          setStatus('Choose Boy or Girl before starting the conversation.', 'error');
+          return;
+        }
+        if (!supabaseClient) {
+          setStatus('Please configure your Supabase project URL and public anon key in the file before using the app.', 'error');
+          return;
+        }
+
+        elements.continueBtn.disabled = true;
+        elements.continueBtn.textContent = 'Connecting…';
+        try {
+          setStatus('Opening your private conversation…');
+          const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+          if (sessionError) throw sessionError;
+
+          let user = sessionData.session?.user;
+          if (!user) {
+            const { data, error } = await supabaseClient.auth.signInAnonymously({
+              options: { data: { display_name: state.role, role: state.role } }
+            });
+            if (error) {
+              if (error.message && /anonymous/i.test(error.message)) {
+                throw new Error('Anonymous sign-ins are not enabled for this Supabase project. Enable them in Authentication settings, then try again.');
+              }
+              throw error;
+            }
+            user = data.user;
+          }
+
+          if (!user) throw new Error('Could not start a private session. Please try again.');
+
+          state.currentUser = user;
+          state.currentUserId = user.id;
+          savePreferences();
+          await saveProfile(state.role);
+          await ensureRoomAccess();
+          const { error: roleError } = await supabaseClient.rpc('join_room_by_invite', {
+            p_invite_code: state.roomCode,
+            p_role: state.role
+          });
+          if (roleError) throw roleError;
+          await initialRoomLoad();
+        } catch (error) {
+          console.error(error);
+          const message = error.message || 'Unable to open the conversation.';
+          if (/relation .* does not exist/i.test(message)) {
+            setStatus('The chat database tables are missing. Run database-setup.sql first, then anonymous-chat-migration.sql, in the same Supabase project.', 'error');
+          } else if (/function .* does not exist|could not find the function/i.test(message)) {
+            setStatus('The anonymous-chat SQL migration is not installed yet. Run anonymous-chat-migration.sql in Supabase, then refresh this page.', 'error');
+          } else if (/anonymous.*(disabled|not enabled)|anonymous sign-ins/i.test(message)) {
+            setStatus('Enable Anonymous Sign-Ins in Supabase Authentication settings, then try again.', 'error');
+          } else {
+            setStatus(message, 'error');
+          }
+        } finally {
+          elements.continueBtn.disabled = false;
+          elements.continueBtn.textContent = 'Start chatting';
+        }
+      }
+
+      async function shareInvite() {
+        const inviteLink = buildRoomLink();
+        if (!inviteLink) {
+          setStatus('This conversation does not have an invite link yet.', 'error');
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(inviteLink);
+          elements.connectionStatus.textContent = 'Invite link copied';
+          window.setTimeout(() => {
+            elements.connectionStatus.textContent = 'Live now';
+          }, 2500);
+        } catch (error) {
+          console.warn('Clipboard access unavailable:', error);
+          window.prompt('Copy this private invite link and send it to the other person:', inviteLink);
+        }
+      }
+
+      async function handleSend() {
+        const content = elements.composerInput.value.trim();
+        if (!content) {
+          setStatus('Empty messages are not allowed.', 'error');
+          return;
+        }
+
+        const payload = {
+          room_id: state.roomId,
+          sender_id: state.currentUserId,
+          content: content.slice(0, 5000),
+          created_at: new Date().toISOString()
+        };
+
+        const { data, error } = await supabaseClient.from('messages').insert(payload).select().single();
+        if (error) {
+          console.error(error);
+          setStatus('Message failed to send. Please try again.', 'error');
+          return;
+        }
+
+        elements.composerInput.value = '';
+        elements.composerInput.style.height = 'auto';
+        setStatus('', 'success');
+        mergeMessages([data]);
+        renderMessages();
+        scrollToBottom(true);
+      }
+
+      function handleComposerKeydown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          handleSend();
+          return;
+        }
+
+        if (event.key === 'Enter' && event.shiftKey) {
+          const textarea = event.target;
+          textarea.value += '\n';
+        }
+
+        triggerTypingIndicator();
+      }
+
+      function triggerTypingIndicator() {
+        if (!state.roomId || !state.currentUserId) return;
+        if (state.typingTimer) clearTimeout(state.typingTimer);
+
+        const payload = { userId: state.currentUserId, role: state.role, isTyping: true };
+        if (state.channel) {
+          state.channel.send({ type: 'broadcast', event: 'typing', payload });
+        }
+
+        state.typingTimer = setTimeout(() => {
+          if (state.channel) {
+            state.channel.send({ type: 'broadcast', event: 'typing', payload: { userId: state.currentUserId, role: state.role, isTyping: false } });
+          }
+        }, 1300);
+      }
+
+      function attachComposerBehavior() {
+        elements.composerInput.addEventListener('input', () => {
+          const value = elements.composerInput.value;
+          elements.sendBtn.disabled = !value.trim();
+          elements.composerInput.style.height = 'auto';
+          elements.composerInput.style.height = `${Math.min(elements.composerInput.scrollHeight, 160)}px`;
+          triggerTypingIndicator();
+        });
+
+        elements.composerInput.addEventListener('keydown', handleComposerKeydown);
+        elements.sendBtn.disabled = true;
+        elements.sendBtn.addEventListener('click', handleSend);
+        elements.emojiBtn.addEventListener('click', () => {
+          const emoji = ['😊', '💬', '💛', '😍', '✨', '❤️'][Math.floor(Math.random() * 6)];
+          const current = elements.composerInput.value;
+          elements.composerInput.value = `${current}${emoji}`;
+          elements.sendBtn.disabled = false;
+          triggerTypingIndicator();
+        });
+      }
+
+      function bindUi() {
+        elements.continueBtn.addEventListener('click', handleContinue);
+        elements.clearRoomBtn.addEventListener('click', () => {
+          elements.roomCodeInput.value = '';
+          const url = new URL(window.location.href);
+          url.searchParams.delete('code');
+          url.searchParams.delete('room');
+          window.history.replaceState({}, '', url);
+        });
+        elements.backBtn.addEventListener('click', () => {
+          if (state.channel) {
+            supabaseClient.removeChannel(state.channel);
+            state.channel = null;
+          }
+          showScreen('welcome');
+          setStatus('Choose your display name, then continue to the conversation.', 'success');
+        });
+        elements.inviteBtn.addEventListener('click', shareInvite);
+        elements.searchBtn.addEventListener('click', () => {
+          elements.searchPanel.classList.toggle('hidden');
+          if (!elements.searchPanel.classList.contains('hidden')) {
+            elements.searchInput.focus();
+          }
+        });
+        elements.closeSearchBtn.addEventListener('click', () => elements.searchPanel.classList.add('hidden'));
+        elements.runSearchBtn.addEventListener('click', () => searchMessages(elements.searchInput.value));
+        elements.searchInput.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') searchMessages(elements.searchInput.value);
+        });
+        elements.jumpToLatestBtn.addEventListener('click', () => {
+          state.unreadCount = 0;
+          elements.jumpToLatestBtn.classList.add('hidden');
+          scrollToBottom(true);
+        });
+        elements.messagesContainer.addEventListener('scroll', () => {
+          const nearBottom = isNearBottom();
+          if (nearBottom) {
+            state.unreadCount = 0;
+            elements.jumpToLatestBtn.classList.add('hidden');
+          }
+
+          if (elements.messagesContainer.scrollTop < 160 && state.hasMore && !state.loadingOlder) {
+            state.loadingOlder = true;
+            fetchMessages({ offset: 'older' }).finally(() => {
+              state.loadingOlder = false;
+            });
+          }
+
+          updateMessagesScrollState();
+        });
+      }
+
+      async function searchMessages(term) {
+        const query = (term || '').trim();
+        if (!query) {
+          elements.searchMeta.textContent = 'Please type a message keyword.';
+          renderSearchResults([]);
+          return;
+        }
+        try {
+          elements.searchMeta.textContent = 'Searching…';
+          const { data, error } = await supabaseClient.from('messages')
+            .select('*')
+            .eq('room_id', state.roomId)
+            .ilike('content', `%${query}%`)
+            .order('created_at', { ascending: false })
+            .limit(30);
+
+          if (error) throw error;
+          elements.searchMeta.textContent = `${data.length} result${data.length === 1 ? '' : 's'}`;
+          renderSearchResults(data || []);
+        } catch (error) {
+          console.error(error);
+          elements.searchMeta.textContent = 'Search failed';
+        }
+      }
+
+      function jumpToMessage(messageId) {
+        const message = state.messages.find(item => item.id === messageId);
+        if (!message) return;
+        const nodes = [...document.querySelectorAll('.bubble')];
+        const target = nodes.find(node => node.textContent === message.content && node.closest('.message-row'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      async function boot() {
+        loadPreferences();
+        updateRoleSelection();
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteFromUrl = urlParams.get('code') || urlParams.get('room');
+        if (inviteFromUrl) {
+          elements.roomCodeInput.value = inviteFromUrl;
+          state.roomId = null;
+          state.roomCode = null;
+        }
+        bindUi();
+        initRoleButtons();
+        attachComposerBehavior();
+
+        if (!supabaseClient) {
+          setStatus('The app is waiting for your Supabase project details. Update the config values at the top of this file.', 'error');
+          return;
+        }
+
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+        const session = sessionData?.session;
+        if (session && session.user) {
+          state.currentUser = session.user;
+          state.currentUserId = session.user.id;
+          if (state.roomId) {
+            await initialRoomLoad();
+          } else {
+            showScreen('welcome');
+          }
+        } else {
+          showScreen('welcome');
+          setStatus('Select a role and sign in to start the conversation.', 'success');
+        }
+      }
+
+      boot();
+    </script>
+  </body>
+</html>
